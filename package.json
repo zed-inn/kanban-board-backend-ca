@@ -1,0 +1,27 @@
+{
+  "name": "kanban-board-backend-ca",
+  "version": "1.0.0",
+  "description": "Kanban Board Backend Application",
+  "main": "src/app.js",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "npm run clean && npx tsc -p tsconfig.json",
+    "dev": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zed-inn/kanban-board-backend-ca.git"
+  },
+  "author": "zed",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zed-inn/kanban-board-backend-ca/issues"
+  },
+  "homepage": "https://github.com/zed-inn/kanban-board-backend-ca#readme",
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "nodemon": "^3.1.14",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
