@@ -8,7 +8,7 @@
     "types": [],
 
     "paths": {
-      "@modules/*": ["./src/modules/*"],
+      "@interfaces/*": ["./src/interfaces/*"],
       "@shared/*": ["./src/shared/*"],
       "@config/*": ["./src/config/*"]
     },
