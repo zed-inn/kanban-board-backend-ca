@@ -1,11 +1,13 @@
 import db from "@config/db";
+import { PostgresDatabaseConn } from "@shared/libs/postgresdb-conn";
 import { snakeToCamel } from "@shared/utils/snake-to-camel";
 import { ColumnRepository } from "kanban";
 import { Column } from "kanban/src/core/entities/column";
 import { NoColumnError } from "kanban/src/core/errors/column.error";
+import { PoolClient } from "pg";
 import { z } from "zod";
 
-class PostgresColumnRepository implements ColumnRepository {
+export class PostgresColumnRepository implements ColumnRepository {
   private schema = `CREATE TABLE IF NOT EXISTS columns (
         id UUID PRIMARY KEY UNIQUE NOT NULL DEFAULT UUIDV7(),
         name TEXT NOT NULL,
@@ -27,17 +29,25 @@ class PostgresColumnRepository implements ColumnRepository {
     updatedAt: z.date(),
   });
 
+  constructor(private client: PostgresDatabaseConn | PoolClient) {}
+
   init = async () => {
-    await db.query(this.schema);
+    await this.client.query(this.schema);
   };
 
   exists = async (id: string): Promise<boolean> => {
-    const res = await db.query("SELECT * FROM columns WHERE id = $1;", [id]);
+    const res = await this.client.query(
+      "SELECT * FROM columns WHERE id = $1;",
+      [id],
+    );
     return res.rowCount === 0 ? false : true;
   };
 
   getById = async (id: string): Promise<Column> => {
-    const res = await db.query("SELECT * FROM columns WHERE id = $1;", [id]);
+    const res = await this.client.query(
+      "SELECT * FROM columns WHERE id = $1;",
+      [id],
+    );
     if (res.rowCount === 0) throw new NoColumnError();
 
     const col = this.model.parse(snakeToCamel(res.rows[0]));
@@ -50,7 +60,7 @@ class PostgresColumnRepository implements ColumnRepository {
   };
 
   getTopInBoard = async (boardId: string): Promise<Column | null> => {
-    const res = await db.query(
+    const res = await this.client.query(
       "SELECT * FROM columns WHERE board_id = $1 ORDER BY position DESC LIMIT 1;",
       [boardId],
     );
@@ -69,7 +79,7 @@ class PostgresColumnRepository implements ColumnRepository {
     position: number,
     boardId: string,
   ): Promise<Column | null> => {
-    const res = await db.query(
+    const res = await this.client.query(
       "SELECT * FROM columns WHERE board_id = $1 AND position > $2 ORDER BY position ASC LIMIT 1;",
       [boardId, position],
     );
@@ -89,12 +99,12 @@ class PostgresColumnRepository implements ColumnRepository {
 
     const exists = this.exists(column.id);
     if (!exists)
-      await db.query(
+      await this.client.query(
         "INSERT INTO columns(id, name, position, board_id) VALUES($1, $2, $3, $4) RETURNING *;",
         [colAttrbs.id, colAttrbs.name, colAttrbs.position, colAttrbs.boardId],
       );
     else
-      await db.query(
+      await this.client.query(
         "UPDATE columns SET name = $1, position = $2, updated_at = NOW() WHERE id = $3 RETURNING *;",
         [colAttrbs.name, colAttrbs.position, colAttrbs.id],
       );
@@ -104,10 +114,10 @@ class PostgresColumnRepository implements ColumnRepository {
     const exists = this.exists(column.id);
     if (!exists) throw new NoColumnError();
 
-    await db.query("DELETE FROM columns WHERE id = $1 RETURNING *;", [
+    await this.client.query("DELETE FROM columns WHERE id = $1 RETURNING *;", [
       column.id,
     ]);
   };
 }
 
-export const pgColumnRepo = new PostgresColumnRepository();
+export const pgColumnRepo = new PostgresColumnRepository(db);

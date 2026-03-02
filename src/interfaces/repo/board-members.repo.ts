@@ -5,8 +5,10 @@ import db from "@config/db";
 import { snakeToCamel } from "@shared/utils/snake-to-camel";
 import { NotBoardMemberError } from "kanban/src/core/errors/board.error";
 import { Board } from "kanban/src/core/entities/board";
+import { PostgresDatabaseConn } from "@shared/libs/postgresdb-conn";
+import { PoolClient } from "pg";
 
-class PostgresBoardMembersRepository implements MemberRepository {
+export class PostgresBoardMembersRepository implements MemberRepository {
   private schema = `CREATE TABLE IF NOT EXISTS board_members (
         board_id UUID NOT NULL,
         user_id UUID NOT NULL,
@@ -24,12 +26,14 @@ class PostgresBoardMembersRepository implements MemberRepository {
     updatedAt: z.date(),
   });
 
+  constructor(private client: PostgresDatabaseConn | PoolClient) {}
+
   init = async () => {
-    await db.query(this.schema);
+    await this.client.query(this.schema);
   };
 
   exists = async (membership: BoardMembership): Promise<boolean> => {
-    const res = await db.query(
+    const res = await this.client.query(
       "SELECT * FROM board_members WHERE board_id = $1 and member_id = $2;",
       [membership.attrbs.boardId, membership.attrbs.memberId],
     );
@@ -37,7 +41,7 @@ class PostgresBoardMembersRepository implements MemberRepository {
   };
 
   getAllBoardMemberIdsById = async (boardId: string): Promise<string[]> => {
-    const res = await db.query(
+    const res = await this.client.query(
       "SELECT * FROM board_members WHERE board_id = $1;",
       [boardId],
     );
@@ -49,12 +53,12 @@ class PostgresBoardMembersRepository implements MemberRepository {
     const exists = await this.exists(membership);
 
     if (!exists)
-      await db.query(
+      await this.client.query(
         "INSERT INTO board_members(board_id, member_id) VALUES($1, $2) RETURNING *;",
         [membership.attrbs.boardId, membership.attrbs.memberId],
       );
     else
-      await db.query(
+      await this.client.query(
         "UPDATE board_members SET updated_at = NOW() WHERE board_id = $1 AND member_id = $2 RETURNING *;",
         [membership.attrbs.boardId, membership.attrbs.memberId],
       );
@@ -64,7 +68,7 @@ class PostgresBoardMembersRepository implements MemberRepository {
     const exists = await this.exists(membership);
     if (!exists) throw new NotBoardMemberError();
 
-    await db.query(
+    await this.client.query(
       "DELETE FROM board_members WHERE board_id = $1 AND member_id = $2 RETURNING *;",
       [membership.attrbs.boardId, membership.attrbs.memberId],
     );
@@ -78,4 +82,4 @@ class PostgresBoardMembersRepository implements MemberRepository {
   };
 }
 
-export const pgBoardMemberRepo = new PostgresBoardMembersRepository();
+export const pgBoardMemberRepo = new PostgresBoardMembersRepository(db);

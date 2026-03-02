@@ -4,8 +4,10 @@ import { BoardRepository } from "kanban";
 import { Board } from "kanban/src/core/entities/board";
 import { NoBoardError } from "kanban/src/core/errors/board.error";
 import { snakeToCamel } from "@shared/utils/snake-to-camel";
+import { PostgresDatabaseConn } from "@shared/libs/postgresdb-conn";
+import { PoolClient } from "pg";
 
-class PostgresBoardRepository implements BoardRepository {
+export class PostgresBoardRepository implements BoardRepository {
   private schema = `CREATE TABLE IF NOT EXISTS boards (
         id UUID PRIMARY KEY UNIQUE NOT NULL DEFAULT UUIDV7(),
         name TEXT NOT NULL,
@@ -25,17 +27,23 @@ class PostgresBoardRepository implements BoardRepository {
     updatedAt: z.date(),
   });
 
+  constructor(private client: PostgresDatabaseConn | PoolClient) {}
+
   init = async () => {
-    await db.query(this.schema);
+    await this.client.query(this.schema);
   };
 
   exists = async (id: string): Promise<boolean> => {
-    const res = await db.query("SELECT * FROM boards WHERE id = $1;", [id]);
+    const res = await this.client.query("SELECT * FROM boards WHERE id = $1;", [
+      id,
+    ]);
     return res.rowCount === 0 ? false : true;
   };
 
   getById = async (id: string): Promise<Board> => {
-    const res = await db.query("SELECT * FROM boards WHERE id = $1;", [id]);
+    const res = await this.client.query("SELECT * FROM boards WHERE id = $1;", [
+      id,
+    ]);
     if (res.rowCount == 0) throw new NoBoardError();
 
     const board = this.model.parse(snakeToCamel(res.rows[0]));
@@ -51,12 +59,12 @@ class PostgresBoardRepository implements BoardRepository {
 
     const exists = await this.exists(board.id);
     if (!exists)
-      await db.query(
+      await this.client.query(
         "INSERT INTO boards(id, name, owner_id) VALUES($1, $2, $3) RETURNING *;",
         [boardAttrbs.id, boardAttrbs.name, boardAttrbs.ownerId],
       );
     else
-      await db.query(
+      await this.client.query(
         "UPDATE boards SET name = $1, owner_id = $2, updated_at = NOW() WHERE id = $3 RETURNING *;",
         [boardAttrbs.name, boardAttrbs.ownerId, boardAttrbs.id],
       );
@@ -66,8 +74,10 @@ class PostgresBoardRepository implements BoardRepository {
     const exists = await this.exists(board.id);
     if (!exists) throw new NoBoardError();
 
-    await db.query("DELETE FROM boards WHERE id = $1 RETURNING *;", [board.id]);
+    await this.client.query("DELETE FROM boards WHERE id = $1 RETURNING *;", [
+      board.id,
+    ]);
   };
 }
 
-export const pgBoardRepo = new PostgresBoardRepository();
+export const pgBoardRepo = new PostgresBoardRepository(db);

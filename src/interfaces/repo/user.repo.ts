@@ -3,8 +3,10 @@ import bcrypt from "bcryptjs";
 import { UserRepository } from "kanban";
 import db from "@config/db";
 import { InvalidPasswordError } from "@shared/errors/user.error";
+import { PostgresDatabaseConn } from "@shared/libs/postgresdb-conn";
+import { PoolClient } from "pg";
 
-class PostgresUserRepository implements UserRepository {
+export class PostgresUserRepository implements UserRepository {
   private schema = `CREATE TABLE IF NOT EXISTS users (
         id UUID PRIMARY KEY UNIQUE NOT NULL DEFAULT UUIDV7(),
         email TEXT UNIQUE NOT NULL,
@@ -21,8 +23,10 @@ class PostgresUserRepository implements UserRepository {
     updatedAt: z.date(),
   });
 
+  constructor(private client: PostgresDatabaseConn | PoolClient) {}
+
   init = async () => {
-    await db.query(this.schema);
+    await this.client.query(this.schema);
   };
 
   createNew = async (
@@ -39,11 +43,11 @@ class PostgresUserRepository implements UserRepository {
       .pick({ id: true, email: true, passwordHash: true })
       .parse({ id, email, passwordHash });
 
-    await db.query(
+    await this.client.query(
       "INSERT INTO users(id, email, password_hash) VALUES($1, $2, $3) RETURNING *;",
       [userAttrbs.id, userAttrbs.email, userAttrbs.passwordHash],
     );
   };
 }
 
-export const pgUserRepo = new PostgresUserRepository();
+export const pgUserRepo = new PostgresUserRepository(db);

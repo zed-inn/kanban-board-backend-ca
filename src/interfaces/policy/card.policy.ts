@@ -1,13 +1,17 @@
 import db from "@config/db";
+import { PostgresDatabaseConn } from "@shared/libs/postgresdb-conn";
 import { CardPolicy } from "kanban";
 import {
   CardNotInColumnError,
   InvalidCardPositionError,
 } from "kanban/src/core/errors/card.error";
+import { PoolClient } from "pg";
 
-class PostgresCardPolicy implements CardPolicy {
+export class PostgresCardPolicy implements CardPolicy {
+  constructor(private client: PostgresDatabaseConn | PoolClient) {}
+
   ensureCardInColumn = async (id: string, columnId: string): Promise<void> => {
-    const res = await db.query(
+    const res = await this.client.query(
       "SELECT * FROM cards WHERE id = $1 AND column_id = $2;",
       [id, columnId],
     );
@@ -18,7 +22,7 @@ class PostgresCardPolicy implements CardPolicy {
     position: number,
     columnId: string,
   ): Promise<void> => {
-    const res = await db.query(
+    const res = await this.client.query(
       "SELECT * FROM cards WHERE position = $1 AND column_id = $2;",
       [position, columnId],
     );
@@ -26,4 +30,4 @@ class PostgresCardPolicy implements CardPolicy {
   };
 }
 
-export const pgCardPolicy = new PostgresCardPolicy();
+export const pgCardPolicy = new PostgresCardPolicy(db);

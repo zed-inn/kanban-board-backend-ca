@@ -4,8 +4,10 @@ import db from "@config/db";
 import { Card } from "kanban/src/core/entities/card";
 import { NoCardError } from "kanban/src/core/errors/card.error";
 import { snakeToCamel } from "@shared/utils/snake-to-camel";
+import { PostgresDatabaseConn } from "@shared/libs/postgresdb-conn";
+import { PoolClient } from "pg";
 
-class PostgresCardRepository implements CardRepository {
+export class PostgresCardRepository implements CardRepository {
   private schema = `CREATE TABLE IF NOT EXISTS cards (
         id UUID PRIMARY KEY UNIQUE NOT NULL DEFAULT UUIDV7(),
         title TEXT NOT NULL,
@@ -32,17 +34,23 @@ class PostgresCardRepository implements CardRepository {
     updatedAt: z.date(),
   });
 
+  constructor(private client: PostgresDatabaseConn | PoolClient) {}
+
   init = async () => {
-    await db.query(this.schema);
+    await this.client.query(this.schema);
   };
 
   exists = async (id: string): Promise<boolean> => {
-    const res = await db.query("SELECT * FROM cards WHERE id = $1;", [id]);
+    const res = await this.client.query("SELECT * FROM cards WHERE id = $1;", [
+      id,
+    ]);
     return res.rowCount === 0 ? false : true;
   };
 
   getById = async (id: string): Promise<Card> => {
-    const res = await db.query("SELECT * FROM cards WHERE id = $1;", [id]);
+    const res = await this.client.query("SELECT * FROM cards WHERE id = $1;", [
+      id,
+    ]);
     if (res.rowCount === 0) throw new NoCardError();
 
     const card = this.model.parse(snakeToCamel(res.rows[0]));
@@ -56,7 +64,7 @@ class PostgresCardRepository implements CardRepository {
   };
 
   getTopInColumn = async (columnId: string): Promise<Card | null> => {
-    const res = await db.query(
+    const res = await this.client.query(
       "SELECT * FROM cards WHERE column_id = $1 ORDER BY position DESC LIMIT 1;",
       [columnId],
     );
@@ -76,7 +84,7 @@ class PostgresCardRepository implements CardRepository {
     position: number,
     columnId: string,
   ): Promise<Card | null> => {
-    const res = await db.query(
+    const res = await this.client.query(
       "SELECT * FROM cards WHERE column_id = $1 AND position > $2 ORDER BY position ASC LIMIT 1;",
       [columnId, position],
     );
@@ -97,7 +105,7 @@ class PostgresCardRepository implements CardRepository {
 
     const exists = await this.exists(card.id);
     if (!exists)
-      await db.query(
+      await this.client.query(
         "INSERT INTO cards(id, title, content, position, column_id) VALUES($1, $2, $3, $4, $5) RETURNING *;",
         [
           cardAttrbs.id,
@@ -108,7 +116,7 @@ class PostgresCardRepository implements CardRepository {
         ],
       );
     else
-      await db.query(
+      await this.client.query(
         "UPDATE cards SET title = $1, content = $2, position = $3, column_id = $4, updated_at = NOW() WHERE id = $5 RETURNING *;",
         [
           cardAttrbs.title,
@@ -124,8 +132,10 @@ class PostgresCardRepository implements CardRepository {
     const exists = await this.exists(card.id);
     if (!exists) throw new NoCardError();
 
-    await db.query("DELETE FROM cards WHERE id = $1 RETURNING *;", [card.id]);
+    await this.client.query("DELETE FROM cards WHERE id = $1 RETURNING *;", [
+      card.id,
+    ]);
   };
 }
 
-export const pgCardRepo = new PostgresCardRepository();
+export const pgCardRepo = new PostgresCardRepository(db);

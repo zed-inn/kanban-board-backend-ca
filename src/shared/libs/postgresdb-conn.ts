@@ -69,6 +69,10 @@ export class PostgresDatabaseConn {
     });
   }
 
+  public client = async () => {
+    return this.pool.connect();
+  };
+
   public query = async (query: string, values?: unknown[]) => {
     const res = await this.pool.query(query, values);
     return res;
