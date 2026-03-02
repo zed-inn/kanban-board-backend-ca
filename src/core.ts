@@ -6,7 +6,7 @@ import { pgCardRepo } from "@interfaces/repo/card.repo";
 import { pgBoardMemberPolicy } from "@interfaces/policy/board-member.policy";
 import { pgCardPolicy } from "@interfaces/policy/card.policy";
 import { pgUow } from "@interfaces/utils/unit-of-work";
-import { uuidv7Gen } from "@shared/generator/uuidv7-generator";
+import { uuidv7Gen } from "@interfaces/utils/uuidv7-generator";
 import { socketEventEmitter } from "@interfaces/emitter/event-emitter";
 import { pgColumnPolicy } from "@interfaces/policy/column.policy";
 
