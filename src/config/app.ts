@@ -1,5 +1,5 @@
 import fastify from "fastify";
-import { env } from "./config/env";
+import { env } from "./env";
 
 const app = fastify({
   logger: env.NODE_ENV === "dev",
