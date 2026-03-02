@@ -7,6 +7,12 @@
     "target": "esnext",
     "types": [],
 
+    "paths": {
+      "@modules/*": ["./src/modules/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@config/*": ["./src/config/*"]
+    },
+
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
