@@ -18,7 +18,7 @@ export class PostgresColumnRepository implements ColumnRepository {
         FOREIGN KEY(board_id) REFERENCES boards(id) ON DELETE CASCADE
     );`;
 
-  private model = z.object({
+  public model = z.object({
     id: z.uuidv7("Column id is required."),
     name: z
       .string("Column name is required.")

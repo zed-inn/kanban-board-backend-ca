@@ -19,7 +19,7 @@ export class PostgresCardRepository implements CardRepository {
         FOREIGN KEY(column_id) REFERENCES columns(id) ON DELETE CASCADE
     );`;
 
-  private model = z.object({
+  public model = z.object({
     id: z.uuidv7("Card id is required."),
     title: z
       .string("Card title is required.")

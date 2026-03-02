@@ -17,7 +17,7 @@ export class PostgresBoardRepository implements BoardRepository {
         FOREIGN KEY(owner_id) REFERENCES users(id) ON DELETE CASCADE
     );`;
 
-  private model = z.object({
+  public model = z.object({
     id: z.uuidv7("Board id is required."),
     name: z
       .string("Board name is required.")

@@ -15,7 +15,7 @@ export class PostgresUserRepository implements UserRepository {
         updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
     );`;
 
-  private model = z.object({
+  public model = z.object({
     id: z.uuidv7("User Id is required."),
     email: z.email("Valid email is required."),
     passwordHash: z.string("Password is required."),
