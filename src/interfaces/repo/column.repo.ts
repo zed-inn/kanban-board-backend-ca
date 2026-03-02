@@ -5,7 +5,7 @@ import { Column } from "kanban/src/core/entities/column";
 import { NoColumnError } from "kanban/src/core/errors/column.error";
 import { z } from "zod";
 
-export class PostgresColumnRepository implements ColumnRepository {
+class PostgresColumnRepository implements ColumnRepository {
   private schema = `CREATE TABLE IF NOT EXISTS columns (
         id UUID PRIMARY KEY UNIQUE NOT NULL DEFAULT UUIDV7(),
         name TEXT NOT NULL,
@@ -109,3 +109,5 @@ export class PostgresColumnRepository implements ColumnRepository {
     ]);
   };
 }
+
+export const pgColumnRepo = new PostgresColumnRepository();

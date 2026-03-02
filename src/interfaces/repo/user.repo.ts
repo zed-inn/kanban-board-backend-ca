@@ -4,7 +4,7 @@ import { UserRepository } from "kanban";
 import db from "@config/db";
 import { InvalidPasswordError } from "@shared/errors/user.error";
 
-export class PostgresUserRepository implements UserRepository {
+class PostgresUserRepository implements UserRepository {
   private schema = `CREATE TABLE IF NOT EXISTS users (
         id UUID PRIMARY KEY UNIQUE NOT NULL DEFAULT UUIDV7(),
         email TEXT UNIQUE NOT NULL,
@@ -45,3 +45,5 @@ export class PostgresUserRepository implements UserRepository {
     );
   };
 }
+
+export const pgUserRepo = new PostgresUserRepository();

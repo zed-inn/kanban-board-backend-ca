@@ -5,7 +5,7 @@ import { Board } from "kanban/src/core/entities/board";
 import { NoBoardError } from "kanban/src/core/errors/board.error";
 import { snakeToCamel } from "@shared/utils/snake-to-camel";
 
-export class PostgresBoardRepository implements BoardRepository {
+class PostgresBoardRepository implements BoardRepository {
   private schema = `CREATE TABLE IF NOT EXISTS boards (
         id UUID PRIMARY KEY UNIQUE NOT NULL DEFAULT UUIDV7(),
         name TEXT NOT NULL,
@@ -69,3 +69,5 @@ export class PostgresBoardRepository implements BoardRepository {
     await db.query("DELETE FROM boards WHERE id = $1 RETURNING *;", [board.id]);
   };
 }
+
+export const pgBoardRepo = new PostgresBoardRepository();

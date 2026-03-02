@@ -5,7 +5,7 @@ import {
   InvalidCardPositionError,
 } from "kanban/src/core/errors/card.error";
 
-export class PostgresCardPolicy implements CardPolicy {
+class PostgresCardPolicy implements CardPolicy {
   ensureCardInColumn = async (id: string, columnId: string): Promise<void> => {
     const res = await db.query(
       "SELECT * FROM cards WHERE id = $1 AND column_id = $2;",
@@ -25,3 +25,5 @@ export class PostgresCardPolicy implements CardPolicy {
     if (res.rowCount !== 0) throw new InvalidCardPositionError();
   };
 }
+
+export const pgCardPolicy = new PostgresCardPolicy();

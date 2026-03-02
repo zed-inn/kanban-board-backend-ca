@@ -5,7 +5,7 @@ import {
   NotBoardOwnerError,
 } from "kanban/src/core/errors/board.error";
 
-export class PostgresBoardMemberPolicy implements MemberPolicy {
+class PostgresBoardMemberPolicy implements MemberPolicy {
   ensureMember = async (memberId: string, boardId: string): Promise<void> => {
     const res = await db.query(
       "SELECT * FROM board_members WHERE board_id = $1 AND member_id = $2;",
@@ -22,3 +22,5 @@ export class PostgresBoardMemberPolicy implements MemberPolicy {
     if (res.rowCount === 0) throw new NotBoardOwnerError();
   };
 }
+
+export const pgBoardMemberPolicy = new PostgresBoardMemberPolicy();

@@ -5,7 +5,7 @@ import {
   InvalidColumnPositionError,
 } from "kanban/src/core/errors/column.error";
 
-export class PostgresColumnPolicy implements ColumnPolicy {
+class PostgresColumnPolicy implements ColumnPolicy {
   ensureColumnInBoard = async (
     columnId: string,
     boardId: string,
@@ -28,3 +28,5 @@ export class PostgresColumnPolicy implements ColumnPolicy {
     if (res.rowCount !== 0) throw new InvalidColumnPositionError();
   };
 }
+
+export const pgColumnPolicy = new PostgresColumnPolicy();

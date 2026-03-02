@@ -5,7 +5,7 @@ import { Card } from "kanban/src/core/entities/card";
 import { NoCardError } from "kanban/src/core/errors/card.error";
 import { snakeToCamel } from "@shared/utils/snake-to-camel";
 
-export class PostgresCardRepository implements CardRepository {
+class PostgresCardRepository implements CardRepository {
   private schema = `CREATE TABLE IF NOT EXISTS cards (
         id UUID PRIMARY KEY UNIQUE NOT NULL DEFAULT UUIDV7(),
         title TEXT NOT NULL,
@@ -127,3 +127,5 @@ export class PostgresCardRepository implements CardRepository {
     await db.query("DELETE FROM cards WHERE id = $1 RETURNING *;", [card.id]);
   };
 }
+
+export const pgCardRepo = new PostgresCardRepository();

@@ -6,7 +6,7 @@ import { snakeToCamel } from "@shared/utils/snake-to-camel";
 import { NotBoardMemberError } from "kanban/src/core/errors/board.error";
 import { Board } from "kanban/src/core/entities/board";
 
-export class PostgresBoardMembersRepository implements MemberRepository {
+class PostgresBoardMembersRepository implements MemberRepository {
   private schema = `CREATE TABLE IF NOT EXISTS board_members (
         board_id UUID NOT NULL,
         user_id UUID NOT NULL,
@@ -77,3 +77,5 @@ export class PostgresBoardMembersRepository implements MemberRepository {
     );
   };
 }
+
+export const pgBoardMemberRepo = new PostgresBoardMembersRepository();
