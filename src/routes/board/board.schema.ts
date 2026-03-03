@@ -19,3 +19,9 @@ export type UpdateBoardParams = z.infer<typeof UpdateBoardParamsSchema>;
 
 export const DeleteBoardParamsSchema = BoardModel.pick({ id: true });
 export type DeleteBoardParams = z.infer<typeof DeleteBoardParamsSchema>;
+
+export const AddMemberBodySchema = UserModel.pick({ id: true });
+export type AddMemberBody = z.infer<typeof AddMemberBodySchema>;
+
+export const MemberParamsSchema = BoardModel.pick({ id: true });
+export type MemberParams = z.infer<typeof MemberParamsSchema>;

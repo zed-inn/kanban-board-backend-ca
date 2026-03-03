@@ -1,8 +1,10 @@
 import { ZodFastifyInstance } from "@shared/types/zod-fastify";
-import { BoardHandler } from "./board.handler";
+import { BoardHandler, BoardMemberHandler } from "./board.handler";
 import {
+  AddMemberBodySchema,
   CreateBoardBodySchema,
   DeleteBoardParamsSchema,
+  MemberParamsSchema,
   UpdateBoardNameBodySchema,
   UpdateBoardOwnerBodySchema,
   UpdateBoardParamsSchema,
@@ -54,5 +56,28 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
       },
     },
     BoardHandler.deleteBoard,
+  );
+
+  router.post(
+    "/:id/member",
+    {
+      schema: {
+        body: AddMemberBodySchema,
+        params: MemberParamsSchema,
+        response: { 201: GlobalResponseSchema },
+      },
+    },
+    BoardMemberHandler.addMember,
+  );
+
+  router.delete(
+    "/:id/member",
+    {
+      schema: {
+        params: MemberParamsSchema,
+        response: { 204: {} },
+      },
+    },
+    BoardMemberHandler.removeMember,
   );
 };

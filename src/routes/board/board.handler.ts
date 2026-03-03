@@ -1,7 +1,9 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import {
+  AddMemberBody,
   CreateBoardBody,
   DeleteBoardParams,
+  MemberParams,
   UpdateBoardNameBody,
   UpdateBoardOwnerBody,
   UpdateBoardParams,
@@ -66,6 +68,34 @@ export class BoardHandler {
     const user = AuthPayloadSchema.parse(req.user);
 
     await kanban.deleteBoard.execute(p.id, user.id);
+
+    reply.status(204);
+  };
+}
+
+export class BoardMemberHandler {
+  static addMember = async (
+    req: FastifyRequest<{ Body: AddMemberBody; Params: MemberParams }>,
+    reply: FastifyReply,
+  ): Promise<GlobalResponse> => {
+    const b = req.body,
+      p = req.params;
+    const user = AuthPayloadSchema.parse(req.user);
+
+    await kanban.addMember.execute(p.id, user.id, b.id);
+
+    reply.status(201);
+    return { message: "Member added." };
+  };
+
+  static removeMember = async (
+    req: FastifyRequest<{ Params: MemberParams }>,
+    reply: FastifyReply,
+  ): Promise<void> => {
+    const p = req.params;
+    const user = AuthPayloadSchema.parse(req.user);
+
+    await kanban.removeMember.execute(p.id, user.id);
 
     reply.status(204);
   };
