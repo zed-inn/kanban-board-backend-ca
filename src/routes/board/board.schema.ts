@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { pgBoardRepo } from "@interfaces/repo/board.repo";
+import { pgUserRepo } from "@interfaces/repo/user.repo";
 
 export const BoardModel = pgBoardRepo.model;
+export const UserModel = pgUserRepo.model;
 
 export const CreateBoardBodySchema = BoardModel.pick({ name: true });
 export type CreateBoardBody = z.infer<typeof CreateBoardBodySchema>;
@@ -9,7 +11,7 @@ export type CreateBoardBody = z.infer<typeof CreateBoardBodySchema>;
 export const UpdateBoardNameBodySchema = BoardModel.pick({ name: true });
 export type UpdateBoardNameBody = z.infer<typeof UpdateBoardNameBodySchema>;
 
-export const UpdateBoardOwnerBodySchema = BoardModel.pick({ ownerId: true });
+export const UpdateBoardOwnerBodySchema = UserModel.pick({ id: true });
 export type UpdateBoardOwnerBody = z.infer<typeof UpdateBoardOwnerBodySchema>;
 
 export const UpdateBoardParamsSchema = BoardModel.pick({ id: true });

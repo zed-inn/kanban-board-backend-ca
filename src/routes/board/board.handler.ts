@@ -52,7 +52,7 @@ export class BoardHandler {
       p = req.params;
     const user = AuthPayloadSchema.parse(req.user);
 
-    await kanban.changeOwnerOfBoard.execute(p.id, user.id, b.ownerId);
+    await kanban.changeOwnerOfBoard.execute(p.id, user.id, b.id);
 
     reply.status(200);
     return { message: "Board owner changed." };
