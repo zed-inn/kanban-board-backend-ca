@@ -1,8 +1,10 @@
 import { BoardRouter } from "@routes/board/board.route";
+import { ColumnRouter } from "@routes/column/column.route";
 import { ZodFastifyInstance } from "@shared/types/zod-fastify";
 
 const routes: Record<string, (router: ZodFastifyInstance) => Promise<void>> = {
   "/board": BoardRouter,
+  "/board/:boardId": ColumnRouter,
 };
 
 const router = async (app: ZodFastifyInstance) => {
