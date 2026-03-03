@@ -1,10 +1,10 @@
 import { z } from "zod";
-import bcrypt from "bcryptjs";
 import { UserRepository } from "kanban";
 import db from "@config/db";
-import { InvalidPasswordError } from "@shared/errors/user.error";
+import { NoUserError } from "@shared/errors/user.error";
 import { PostgresDatabaseConn } from "@shared/libs/postgresdb-conn";
 import { PoolClient } from "pg";
+import { snakeToCamel } from "@shared/utils/snake-to-camel";
 
 export class PostgresUserRepository implements UserRepository {
   private schema = `CREATE TABLE IF NOT EXISTS users (
@@ -29,16 +29,29 @@ export class PostgresUserRepository implements UserRepository {
     await this.client.query(this.schema);
   };
 
+  existsByEmail = async (email: string) => {
+    const res = await this.client.query(
+      "SELECT * FROM users WHERE email = $1 LIMIT 1;",
+      [email],
+    );
+    return res.rowCount === 0 ? false : true;
+  };
+
+  getByEmail = async (email: string) => {
+    const res = await this.client.query(
+      "SELECT * FROM users WHERE email = $1 LIMIT 1;",
+      [email],
+    );
+    if (res.rowCount === 0) throw new NoUserError();
+
+    return this.model.parse(snakeToCamel(res.rows[0]));
+  };
+
   createNew = async (
     id: string,
     email: string,
-    password: string,
+    passwordHash: string,
   ): Promise<void> => {
-    if (typeof password !== "string" || password.length < 8)
-      throw new InvalidPasswordError();
-
-    const passwordHash = await bcrypt.hash(password, 10);
-
     const userAttrbs = this.model
       .pick({ id: true, email: true, passwordHash: true })
       .parse({ id, email, passwordHash });

@@ -1,1 +1,1 @@
-export class InvalidPasswordError extends Error {}
+export class NoUserError extends Error {}
