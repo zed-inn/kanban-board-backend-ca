@@ -24,7 +24,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
   );
 
   router.patch(
-    "/:id",
+    "/:id/rename",
     {
       schema: {
         body: UpdateBoardNameBodySchema,
@@ -35,8 +35,8 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
     BoardHandler.updateBoardName,
   );
 
-  router.post(
-    "/:id",
+  router.patch(
+    "/:id/change-owner",
     {
       schema: {
         body: UpdateBoardOwnerBodySchema,
