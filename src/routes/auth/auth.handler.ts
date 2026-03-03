@@ -5,7 +5,8 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { LoginBody, SignupBody } from "./auth.schema";
 import { EmailAlreadyUserError, PasswordNotMatchedError } from "./auth.error";
 import { uuidv7Gen } from "@interfaces/utils/uuidv7-generator";
-import { AuthPayloadSchema } from "@shared/schema/auth-payload.schema";
+import { AuthTokenService } from "@shared/services/auth-token.service";
+import { env } from "@config/env";
 
 export class AuthHandler {
   static login = async (
@@ -19,7 +20,15 @@ export class AuthHandler {
 
     if (!passwordMatch) throw new PasswordNotMatchedError();
 
-    // Create token and set in cookies
+    const accessToken = AuthTokenService.createAccessToken({ id: user.id });
+
+    reply.setCookie("access_token", accessToken, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: env.NODE_ENV === "prod",
+      maxAge: AuthTokenService.ACCESS_TOKEN_MAX_AGE,
+    });
 
     reply.status(200);
     return { message: "Log in successfull, cookies set and returned." };
@@ -39,7 +48,15 @@ export class AuthHandler {
     const userId = await uuidv7Gen.generateUnique();
     await pgUserRepo.createNew(userId, b.email, passwordHash);
 
-    // Create token and set in cookies
+    const accessToken = AuthTokenService.createAccessToken({ id: userId });
+
+    reply.setCookie("access_token", accessToken, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: env.NODE_ENV === "prod",
+      maxAge: AuthTokenService.ACCESS_TOKEN_MAX_AGE,
+    });
 
     reply.status(201);
     return { message: "Sign up successfull, cookies set and returned." };
@@ -49,10 +66,7 @@ export class AuthHandler {
     req: FastifyRequest,
     reply: FastifyReply,
   ): Promise<void> => {
-    const user = AuthPayloadSchema.parse(req.user);
-
-    // Delete token and remove from cookies
-
+    reply.clearCookie("access_token");
     reply.status(204);
   };
 }
