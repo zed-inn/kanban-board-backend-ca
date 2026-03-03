@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { pgCardRepo } from "@interfaces/repo/card.repo";
 import { pgColumnRepo } from "@interfaces/repo/column.repo";
+import {
+  GlobalQuerySchema,
+  GlobalResponseSchema,
+} from "@shared/schema/global.schema";
 
 export const CardModel = pgCardRepo.model;
 export const ColumnModel = pgColumnRepo.model;
@@ -38,3 +42,16 @@ export const DeleteCardParamsSchema = CardModel.pick({
   columnId: true,
 }).extend(ColumnModel.pick({ boardId: true }).shape);
 export type DeleteCardParams = z.infer<typeof DeleteCardParamsSchema>;
+
+export const GetCardsQuerySchema = GlobalQuerySchema.pick({ page: true });
+export type GetCardsQuery = z.infer<typeof GetCardsQuerySchema>;
+
+export const GetCardsParamsSchema = CardModel.pick({ columnId: true }).extend(
+  ColumnModel.pick({ boardId: true }).shape,
+);
+export type GetCardsParams = z.infer<typeof GetCardsParamsSchema>;
+
+export const GetCardsResponseSchema = GlobalResponseSchema({
+  cards: z.array(CardModel),
+});
+export type GetCardsResponse = z.infer<typeof GetCardsResponseSchema>;

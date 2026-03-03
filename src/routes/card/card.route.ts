@@ -4,14 +4,30 @@ import {
   CreateCardBodySchema,
   CreateCardParamsSchema,
   DeleteCardParamsSchema,
+  GetCardsParamsSchema,
+  GetCardsResponseSchema,
   UpdateCardBodyBodySchema,
   UpdateCardLocationBodySchema,
   UpdateCardParamsSchema,
 } from "./card.schema";
 import { GlobalResponseSchema } from "@shared/schema/global.schema";
 import { RestrictTo } from "@shared/hook/restrict-access.hook";
+import { GetBoardsQuerySchema } from "@routes/board/board.schema";
 
 export const CardRouter = async (router: ZodFastifyInstance) => {
+  router.get(
+    "/",
+    {
+      schema: {
+        querystring: GetBoardsQuerySchema,
+        params: GetCardsParamsSchema,
+        response: { 200: GetCardsResponseSchema },
+      },
+      preHandler: [RestrictTo.loggedInUser],
+    },
+    CardHandler.getCardsInColumn,
+  );
+
   router.post(
     "/",
     {

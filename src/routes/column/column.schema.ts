@@ -1,5 +1,9 @@
 import { z } from "zod";
 import { pgColumnRepo } from "@interfaces/repo/column.repo";
+import {
+  GlobalQuerySchema,
+  GlobalResponseSchema,
+} from "@shared/schema/global.schema";
 
 export const ColumnModel = pgColumnRepo.model;
 
@@ -28,3 +32,16 @@ export const DeleteColumnParamsSchema = ColumnModel.pick({
   id: true,
 });
 export type DeleteColumnParams = z.infer<typeof DeleteColumnParamsSchema>;
+
+export const GetColumnQuerySchema = GlobalQuerySchema.pick({ page: true });
+export type GetColumnQuery = z.infer<typeof GetColumnQuerySchema>;
+
+export const GetColumnParamsSchema = ColumnModel.pick({
+  boardId: true,
+});
+export type GetColumnParams = z.infer<typeof GetColumnParamsSchema>;
+
+export const GetColumnResponseSchema = GlobalResponseSchema({
+  columns: z.array(ColumnModel),
+});
+export type GetColumnResponse = z.infer<typeof GetColumnResponseSchema>;

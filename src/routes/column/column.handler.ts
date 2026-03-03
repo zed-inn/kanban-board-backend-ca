@@ -6,12 +6,35 @@ import {
   CreateColumnBody,
   CreateColumnParams,
   DeleteColumnParams,
+  GetColumnParams,
+  GetColumnQuery,
+  GetColumnResponse,
   UpdateColumnNameBody,
   UpdateColumnParams,
   UpdateColumnPositionBody,
 } from "./column.schema";
+import { pgBoardMemberPolicy } from "@interfaces/policy/board-member.policy";
+import { pgColumnRepo } from "@interfaces/repo/column.repo";
 
 export class ColumnHandler {
+  static getColumnsInBoard = async (
+    req: FastifyRequest<{
+      Params: GetColumnParams;
+      Querystring: GetColumnQuery;
+    }>,
+    reply: FastifyReply,
+  ): Promise<GetColumnResponse> => {
+    const q = req.query,
+      p = req.params;
+    const user = AuthPayloadSchema.parse(req.user);
+
+    await pgBoardMemberPolicy.ensureMember(user.id, p.boardId);
+    const columns = await pgColumnRepo.getInBoard(p.boardId, q.page);
+
+    reply.status(200);
+    return { message: "Columns fetched.", data: { columns } };
+  };
+
   static addColumn = async (
     req: FastifyRequest<{ Body: CreateColumnBody; Params: CreateColumnParams }>,
     reply: FastifyReply,

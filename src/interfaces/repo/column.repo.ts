@@ -1,5 +1,7 @@
+import { COLUMNS_PER_PAGE } from "@config/constants/pagination";
 import db from "@config/db";
 import { PostgresDatabaseConn } from "@shared/libs/postgresdb-conn";
+import { getOffset } from "@shared/utils/get-offset";
 import { snakeToCamel } from "@shared/utils/snake-to-camel";
 import { ColumnRepository } from "kanban";
 import { Column } from "kanban/src/core/entities/column";
@@ -41,6 +43,16 @@ export class PostgresColumnRepository implements ColumnRepository {
       [id],
     );
     return res.rowCount === 0 ? false : true;
+  };
+
+  getInBoard = async (boardId: string, page: number) => {
+    page = isNaN(page) ? 1 : 0;
+
+    const res = await this.client.query(
+      "SELECT * FROM columns WHERE board_id = $1 ORDER BY position DESC OFFSET $2 LIMIT $3;",
+      [boardId, getOffset(COLUMNS_PER_PAGE, page), COLUMNS_PER_PAGE],
+    );
+    return res.rows.map((r) => this.model.parse(snakeToCamel(r)));
   };
 
   getById = async (id: string): Promise<Column> => {

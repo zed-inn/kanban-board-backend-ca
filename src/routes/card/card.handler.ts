@@ -4,14 +4,36 @@ import {
   CreateCardBody,
   CreateCardParams,
   DeleteCardParams,
+  GetCardsParams,
+  GetCardsQuery,
+  GetCardsResponse,
   UpdateCardBodyBody,
   UpdateCardLocationBody,
   UpdateCardParams,
 } from "./card.schema";
 import { AuthPayloadSchema } from "@shared/schema/auth-payload.schema";
 import kanban from "@shared/core";
+import { pgCardRepo } from "@interfaces/repo/card.repo";
+import { pgBoardMemberPolicy } from "@interfaces/policy/board-member.policy";
+import { pgColumnPolicy } from "@interfaces/policy/column.policy";
 
 export class CardHandler {
+  static getCardsInColumn = async (
+    req: FastifyRequest<{ Params: GetCardsParams; Querystring: GetCardsQuery }>,
+    reply: FastifyReply,
+  ): Promise<GetCardsResponse> => {
+    const q = req.query,
+      p = req.params;
+    const user = AuthPayloadSchema.parse(req.user);
+
+    await pgBoardMemberPolicy.ensureMember(user.id, p.boardId);
+    await pgColumnPolicy.ensureColumnInBoard(p.columnId, p.boardId);
+    const cards = await pgCardRepo.getInColumn(p.columnId, q.page);
+
+    reply.status(200);
+    return { message: "Cards fetched.", data: { cards } };
+  };
+
   static addCard = async (
     req: FastifyRequest<{ Body: CreateCardBody; Params: CreateCardParams }>,
     reply: FastifyReply,

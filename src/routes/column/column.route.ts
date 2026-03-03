@@ -4,6 +4,9 @@ import {
   CreateColumnBodySchema,
   CreateColumnParamsSchema,
   DeleteColumnParamsSchema,
+  GetColumnParamsSchema,
+  GetColumnQuerySchema,
+  GetColumnResponseSchema,
   UpdateColumnNameBodySchema,
   UpdateColumnParamsSchema,
   UpdateColumnPositionBodySchema,
@@ -12,6 +15,19 @@ import { GlobalResponseSchema } from "@shared/schema/global.schema";
 import { RestrictTo } from "@shared/hook/restrict-access.hook";
 
 export const ColumnRouter = async (router: ZodFastifyInstance) => {
+  router.get(
+    "/",
+    {
+      schema: {
+        querystring: GetColumnQuerySchema,
+        params: GetColumnParamsSchema,
+        response: { 201: GetColumnResponseSchema },
+      },
+      preHandler: [RestrictTo.loggedInUser],
+    },
+    ColumnHandler.getColumnsInBoard,
+  );
+
   router.post(
     "/",
     {

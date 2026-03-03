@@ -6,6 +6,8 @@ import { NoCardError } from "kanban/src/core/errors/card.error";
 import { snakeToCamel } from "@shared/utils/snake-to-camel";
 import { PostgresDatabaseConn } from "@shared/libs/postgresdb-conn";
 import { PoolClient } from "pg";
+import { getOffset } from "@shared/utils/get-offset";
+import { CARDS_PER_PAGE } from "@config/constants/pagination";
 
 export class PostgresCardRepository implements CardRepository {
   private schema = `CREATE TABLE IF NOT EXISTS cards (
@@ -45,6 +47,16 @@ export class PostgresCardRepository implements CardRepository {
       id,
     ]);
     return res.rowCount === 0 ? false : true;
+  };
+
+  getInColumn = async (columnId: string, page: number) => {
+    page = isNaN(page) ? 1 : 0;
+
+    const res = await this.client.query(
+      "SELECT * FROM cards WHERE column_id = $1 ORDER BY position DESC OFFSET $2 LIMIT $3;",
+      [columnId, getOffset(CARDS_PER_PAGE, page), CARDS_PER_PAGE],
+    );
+    return res.rows.map((r) => this.model.parse(snakeToCamel(r)));
   };
 
   getById = async (id: string): Promise<Card> => {
