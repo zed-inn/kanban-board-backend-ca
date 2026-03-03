@@ -9,6 +9,7 @@ import {
   UpdateCardParamsSchema,
 } from "./card.schema";
 import { GlobalResponseSchema } from "@shared/schema/global.schema";
+import { RestrictTo } from "@shared/hook/restrict-access.hook";
 
 export const CardRouter = async (router: ZodFastifyInstance) => {
   router.post(
@@ -19,6 +20,7 @@ export const CardRouter = async (router: ZodFastifyInstance) => {
         params: CreateCardParamsSchema,
         response: { 201: GlobalResponseSchema },
       },
+      preHandler: [RestrictTo.loggedInUser],
     },
     CardHandler.addCard,
   );
@@ -31,6 +33,7 @@ export const CardRouter = async (router: ZodFastifyInstance) => {
         params: UpdateCardParamsSchema,
         response: { 200: GlobalResponseSchema },
       },
+      preHandler: [RestrictTo.loggedInUser],
     },
     CardHandler.updateCardBody,
   );
@@ -43,6 +46,7 @@ export const CardRouter = async (router: ZodFastifyInstance) => {
         params: UpdateCardParamsSchema,
         response: { 200: GlobalResponseSchema },
       },
+      preHandler: [RestrictTo.loggedInUser],
     },
     CardHandler.updateCardLocation,
   );
@@ -54,6 +58,7 @@ export const CardRouter = async (router: ZodFastifyInstance) => {
         params: DeleteCardParamsSchema,
         response: { 204: {} },
       },
+      preHandler: [RestrictTo.loggedInUser],
     },
     CardHandler.deleteCard,
   );

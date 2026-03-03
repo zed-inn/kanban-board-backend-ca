@@ -1,5 +1,8 @@
 import { env } from "@config/env";
-import { AuthPayload } from "@shared/schema/auth-payload.schema";
+import {
+  AuthPayload,
+  AuthPayloadSchema,
+} from "@shared/schema/auth-payload.schema";
 import jwt from "jsonwebtoken";
 
 export class AuthTokenService {
@@ -12,6 +15,6 @@ export class AuthTokenService {
   };
 
   static verifyAccessToken = (token: string) => {
-    return jwt.verify(token, env.JWT_SECRET);
+    return AuthPayloadSchema.parse(jwt.verify(token, env.JWT_SECRET));
   };
 }

@@ -1,6 +1,7 @@
 import fastify from "fastify";
 import fastifyCookie from "@fastify/cookie";
 import { env } from "./env";
+import { authenticate } from "@shared/plugin/authenticate.plugin";
 
 const app = fastify({
   logger: env.NODE_ENV === "dev",
@@ -8,5 +9,6 @@ const app = fastify({
 });
 
 app.register(fastifyCookie);
+app.register(authenticate);
 
 export default app;

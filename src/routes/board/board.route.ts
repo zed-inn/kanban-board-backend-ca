@@ -10,6 +10,7 @@ import {
   UpdateBoardParamsSchema,
 } from "./board.schema";
 import { GlobalResponseSchema } from "@shared/schema/global.schema";
+import { RestrictTo } from "@shared/hook/restrict-access.hook";
 
 export const BoardRouter = async (router: ZodFastifyInstance) => {
   router.post(
@@ -19,6 +20,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
         body: CreateBoardBodySchema,
         response: { 201: GlobalResponseSchema },
       },
+      preHandler: [RestrictTo.loggedInUser],
     },
     BoardHandler.createBoard,
   );
@@ -31,6 +33,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
         params: UpdateBoardParamsSchema,
         response: { 200: GlobalResponseSchema },
       },
+      preHandler: [RestrictTo.loggedInUser],
     },
     BoardHandler.updateBoardName,
   );
@@ -43,6 +46,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
         params: UpdateBoardParamsSchema,
         response: { 200: GlobalResponseSchema },
       },
+      preHandler: [RestrictTo.loggedInUser],
     },
     BoardHandler.updateBoardOwner,
   );
@@ -54,6 +58,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
         params: DeleteBoardParamsSchema,
         response: { 204: {} },
       },
+      preHandler: [RestrictTo.loggedInUser],
     },
     BoardHandler.deleteBoard,
   );
@@ -66,6 +71,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
         params: MemberParamsSchema,
         response: { 201: GlobalResponseSchema },
       },
+      preHandler: [RestrictTo.loggedInUser],
     },
     BoardMemberHandler.addMember,
   );
@@ -77,6 +83,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
         params: MemberParamsSchema,
         response: { 204: {} },
       },
+      preHandler: [RestrictTo.loggedInUser],
     },
     BoardMemberHandler.removeMember,
   );

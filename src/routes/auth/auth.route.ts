@@ -2,6 +2,7 @@ import { ZodFastifyInstance } from "@shared/types/zod-fastify";
 import { AuthHandler } from "./auth.handler";
 import { LoginBodySchema, SignupBodySchema } from "./auth.schema";
 import { GlobalResponseSchema } from "@shared/schema/global.schema";
+import { RestrictTo } from "@shared/hook/restrict-access.hook";
 
 export const AuthRouter = async (router: ZodFastifyInstance) => {
   router.post(
@@ -30,6 +31,7 @@ export const AuthRouter = async (router: ZodFastifyInstance) => {
     "/",
     {
       schema: { response: { 204: {} } },
+      preHandler: [RestrictTo.loggedInUser],
     },
     AuthHandler.logout,
   );
