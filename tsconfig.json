@@ -9,6 +9,7 @@
 
     "paths": {
       "@interfaces/*": ["./src/interfaces/*"],
+      "@routes/*": ["./src/routes/*"],
       "@shared/*": ["./src/shared/*"],
       "@config/*": ["./src/config/*"]
     },
