@@ -3,6 +3,8 @@ import {
   AddMemberBody,
   CreateBoardBody,
   DeleteBoardParams,
+  GetBoardsQuery,
+  GetBoardsResponse,
   MemberParams,
   UpdateBoardNameBody,
   UpdateBoardOwnerBody,
@@ -11,8 +13,35 @@ import {
 import { AuthPayloadSchema } from "@shared/schema/auth-payload.schema";
 import kanban from "@shared/core";
 import { GlobalResponse } from "@shared/schema/global.schema";
+import { pgBoardRepo } from "@interfaces/repo/board.repo";
 
 export class BoardHandler {
+  static getBoardsMemberOf = async (
+    req: FastifyRequest<{ Querystring: GetBoardsQuery }>,
+    reply: FastifyReply,
+  ): Promise<GetBoardsResponse> => {
+    const q = req.query;
+    const user = AuthPayloadSchema.parse(req.user);
+
+    const boards = await pgBoardRepo.getMemberBoards(user.id, q.page);
+
+    reply.status(200);
+    return { message: "Boards fetched.", data: { boards } };
+  };
+
+  static getOwnedBoards = async (
+    req: FastifyRequest<{ Querystring: GetBoardsQuery }>,
+    reply: FastifyReply,
+  ): Promise<GetBoardsResponse> => {
+    const q = req.query;
+    const user = AuthPayloadSchema.parse(req.user);
+
+    const boards = await pgBoardRepo.getOwnerBoards(user.id, q.page);
+
+    reply.status(200);
+    return { message: "Boards fetched.", data: { boards } };
+  };
+
   static createBoard = async (
     req: FastifyRequest<{ Body: CreateBoardBody }>,
     reply: FastifyReply,

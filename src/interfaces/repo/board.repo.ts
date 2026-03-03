@@ -6,6 +6,8 @@ import { NoBoardError } from "kanban/src/core/errors/board.error";
 import { snakeToCamel } from "@shared/utils/snake-to-camel";
 import { PostgresDatabaseConn } from "@shared/libs/postgresdb-conn";
 import { PoolClient } from "pg";
+import { getOffset } from "@shared/utils/get-offset";
+import { BOARDS_PER_PAGE } from "@config/constants/pagination";
 
 export class PostgresBoardRepository implements BoardRepository {
   private schema = `CREATE TABLE IF NOT EXISTS boards (
@@ -38,6 +40,26 @@ export class PostgresBoardRepository implements BoardRepository {
       id,
     ]);
     return res.rowCount === 0 ? false : true;
+  };
+
+  getMemberBoards = async (userId: string, page: number) => {
+    page = isNaN(page) ? 1 : page;
+
+    const res = await this.client.query(
+      "SELECT boards.* FROM boards JOIN board_members ON board_members.board_id = boards.id WHERE members.member_id = $1 ORDER BY boards.updated_at DESC OFFSET $2 LIMIT $3;",
+      [userId, getOffset(BOARDS_PER_PAGE, page), BOARDS_PER_PAGE],
+    );
+    return res.rows.map((r) => this.model.parse(snakeToCamel(r)));
+  };
+
+  getOwnerBoards = async (userId: string, page: number) => {
+    page = isNaN(page) ? 1 : page;
+
+    const res = await this.client.query(
+      "SELECT * FROM boards WHERE owner_id = $1 ORDER BY updated_at DESC OFFSET $2 LIMIT $3;",
+      [userId, getOffset(BOARDS_PER_PAGE, page), BOARDS_PER_PAGE],
+    );
+    return res.rows.map((r) => this.model.parse(snakeToCamel(r)));
   };
 
   getById = async (id: string): Promise<Board> => {

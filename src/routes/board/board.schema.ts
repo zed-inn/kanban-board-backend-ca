@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { pgBoardRepo } from "@interfaces/repo/board.repo";
 import { pgUserRepo } from "@interfaces/repo/user.repo";
+import {
+  GlobalQuerySchema,
+  GlobalResponseSchema,
+} from "@shared/schema/global.schema";
 
 export const BoardModel = pgBoardRepo.model;
 export const UserModel = pgUserRepo.model;
@@ -25,3 +29,13 @@ export type AddMemberBody = z.infer<typeof AddMemberBodySchema>;
 
 export const MemberParamsSchema = BoardModel.pick({ id: true });
 export type MemberParams = z.infer<typeof MemberParamsSchema>;
+
+export const GetBoardsQuerySchema = GlobalQuerySchema.pick({
+  page: true,
+});
+export type GetBoardsQuery = z.infer<typeof GetBoardsQuerySchema>;
+
+export const GetBoardsResponseSchema = GlobalResponseSchema({
+  boards: z.array(BoardModel),
+});
+export type GetBoardsResponse = z.infer<typeof GetBoardsResponseSchema>;

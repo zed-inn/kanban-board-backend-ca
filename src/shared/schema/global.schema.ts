@@ -1,11 +1,15 @@
 import { z } from "zod";
 
-export const GlobalSchema = z.object({
+export const GlobalQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
 });
 
-export type GlobalDto = z.infer<typeof GlobalSchema>;
+export type GlobalQueryDto = z.infer<typeof GlobalQuerySchema>;
 
-export const GlobalResponseSchema = () => z.object({ message: z.string() });
+export const GlobalResponseSchema = <T extends z.ZodRawShape>(data?: T) =>
+  z.object({ message: z.string(), ...(data ? { data: z.object(data) } : {}) });
 
-export type GlobalResponse = { message: string };
+export type GlobalResponse<T extends unknown = void> = {
+  message: string;
+  data?: T;
+};

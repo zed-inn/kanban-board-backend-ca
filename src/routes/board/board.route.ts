@@ -4,6 +4,8 @@ import {
   AddMemberBodySchema,
   CreateBoardBodySchema,
   DeleteBoardParamsSchema,
+  GetBoardsQuerySchema,
+  GetBoardsResponseSchema,
   MemberParamsSchema,
   UpdateBoardNameBodySchema,
   UpdateBoardOwnerBodySchema,
@@ -13,6 +15,30 @@ import { GlobalResponseSchema } from "@shared/schema/global.schema";
 import { RestrictTo } from "@shared/hook/restrict-access.hook";
 
 export const BoardRouter = async (router: ZodFastifyInstance) => {
+  router.get(
+    "/",
+    {
+      schema: {
+        querystring: GetBoardsQuerySchema,
+        response: { 200: GetBoardsResponseSchema },
+      },
+      preHandler: [RestrictTo.loggedInUser],
+    },
+    BoardHandler.getBoardsMemberOf,
+  );
+
+  router.get(
+    "/owned",
+    {
+      schema: {
+        querystring: GetBoardsQuerySchema,
+        response: { 200: GetBoardsResponseSchema },
+      },
+      preHandler: [RestrictTo.loggedInUser],
+    },
+    BoardHandler.getOwnedBoards,
+  );
+
   router.post(
     "/",
     {
