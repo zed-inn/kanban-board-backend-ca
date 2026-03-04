@@ -7,13 +7,6 @@
     "target": "esnext",
     "types": [],
 
-    "paths": {
-      "@interfaces/*": ["./src/interfaces/*"],
-      "@routes/*": ["./src/routes/*"],
-      "@shared/*": ["./src/shared/*"],
-      "@config/*": ["./src/config/*"]
-    },
-
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,

@@ -1,5 +1,5 @@
-import app from "@config/app";
-import { io } from "@config/io";
+import app from "./config.old/app";
+import { io } from "./config.old/io";
 
 export const setupIo = () => {
   io.on("connection", async (socket) => {

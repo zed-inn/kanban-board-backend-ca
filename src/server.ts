@@ -1,9 +1,9 @@
-import db from "@config/db";
-import app from "@config/app";
-import { env } from "@config/env";
-import { initRepos } from "@shared/initializer/repo.initializer";
+import db from "./config.old/db";
+import app from "./config.old/app";
+import { env } from "./config.old/env";
+import { initRepos } from "./shared.old/initializer/repo.initializer";
 import { setupIo } from "./io-server";
-import { AppRouter } from "@shared/router/app.router";
+import { AppRouter } from "./shared.old/router/app.router";
 
 const startServer = async () => {
   try {
