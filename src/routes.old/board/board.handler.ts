@@ -10,9 +10,9 @@ import {
   UpdateBoardOwnerBody,
   UpdateBoardParams,
 } from "./board.schema";
-import { AuthPayloadSchema } from "../../shared.old/schema/auth-payload.schema";
+import { AuthPayloadSchema } from "../../shared/schema/auth-payload.schema";
 import kanban from "../../shared.old/core";
-import { GlobalResponse } from "../../shared.old/schema/global.schema";
+import { GlobalResponse } from "../../shared/schema/global.schema";
 import { pgBoardRepo } from "../../interfaces.old/repo/board.repo";
 
 export class BoardHandler {

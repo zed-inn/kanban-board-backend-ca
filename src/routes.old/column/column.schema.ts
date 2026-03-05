@@ -3,7 +3,7 @@ import { pgColumnRepo } from "../../interfaces.old/repo/column.repo";
 import {
   GlobalQuerySchema,
   GlobalResponseSchema,
-} from "../../shared.old/schema/global.schema";
+} from "../../shared/schema/global.schema";
 
 export const ColumnModel = pgColumnRepo.model;
 

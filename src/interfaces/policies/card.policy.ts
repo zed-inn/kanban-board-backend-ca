@@ -3,7 +3,7 @@ import {
   CardPolicy,
   InvalidCardPositionError,
 } from "kanban";
-import { PostgresPolicy } from "../../pg/postgres-policy.service";
+import { PostgresPolicy } from "@shared/services/postgres-policy.service";
 
 export class PostgresCardPolicy extends PostgresPolicy implements CardPolicy {
   async ensureCardInColumn(id: string, columnId: string): Promise<void> {

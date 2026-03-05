@@ -1,11 +1,11 @@
 import bcrypt from "bcryptjs";
 import { pgUserRepo } from "../../interfaces.old/repo/user.repo";
-import { GlobalResponse } from "../../shared.old/schema/global.schema";
+import { GlobalResponse } from "../../shared/schema/global.schema";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { LoginBody, SignupBody } from "./auth.schema";
 import { EmailAlreadyUserError, PasswordNotMatchedError } from "./auth.error";
 import { uuidv7Gen } from "../../interfaces.old/utils/uuidv7-generator";
-import { AuthTokenService } from "../../shared.old/services/auth-token.service";
+import { AuthTokenService } from "../../shared/services/auth-token.service";
 import { env } from "../../config.old/env";
 
 export class AuthHandler {

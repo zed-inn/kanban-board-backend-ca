@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Column, ColumnRepository, NoColumnError } from "kanban";
-import { PostgresRepository } from "../../pg/postgres-repo.service";
+import { PostgresRepository } from "@shared/services/postgres-repo.service";
 
 export const ColumnModel = z.object({
   id: z.uuidv7("Column id is required."),

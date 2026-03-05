@@ -1,4 +1,4 @@
-import { ZodFastifyInstance } from "../../shared.old/types/zod-fastify";
+import { ZodFastifyInstance } from "../../shared/types/zod-fastify";
 import { CardHandler } from "./card.handler";
 import {
   CreateCardBodySchema,
@@ -10,7 +10,7 @@ import {
   UpdateCardLocationBodySchema,
   UpdateCardParamsSchema,
 } from "./card.schema";
-import { GlobalResponseSchema } from "../../shared.old/schema/global.schema";
+import { GlobalResponseSchema } from "../../shared/schema/global.schema";
 import { RestrictTo } from "../../shared.old/hook/restrict-access.hook";
 import { GetBoardsQuerySchema } from "@routes/board/board.schema";
 

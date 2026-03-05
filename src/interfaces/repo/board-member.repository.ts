@@ -5,7 +5,7 @@ import {
   MemberRepository,
   NotBoardMemberError,
 } from "kanban";
-import { PostgresRepository } from "../../pg/postgres-repo.service";
+import { PostgresRepository } from "@shared/services/postgres-repo.service";
 
 export const BoardMemberModel = z.object({
   boardId: z.uuidv7("Board id is required."),

@@ -1,4 +1,4 @@
-import { GlobalResponse } from "../../shared.old/schema/global.schema";
+import { GlobalResponse } from "../../shared/schema/global.schema";
 import { FastifyReply, FastifyRequest } from "fastify";
 import {
   CreateCardBody,
@@ -11,7 +11,7 @@ import {
   UpdateCardLocationBody,
   UpdateCardParams,
 } from "./card.schema";
-import { AuthPayloadSchema } from "../../shared.old/schema/auth-payload.schema";
+import { AuthPayloadSchema } from "../../shared/schema/auth-payload.schema";
 import kanban from "../../shared.old/core";
 import { pgCardRepo } from "../../interfaces.old/repo/card.repo";
 import { pgBoardMemberPolicy } from "../../interfaces.old/policy/board-member.policy";

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Card, CardRepository, NoCardError } from "kanban";
-import { PostgresRepository } from "../../pg/postgres-repo.service";
+import { PostgresRepository } from "@shared/services/postgres-repo.service";
 
 export const CardModel = z.object({
   id: z.uuidv7("Card id is required."),

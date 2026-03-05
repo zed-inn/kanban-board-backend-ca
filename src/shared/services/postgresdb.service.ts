@@ -1,5 +1,5 @@
 import { Pool, PoolClient, QueryResult } from "pg";
-import { DatabaseConnError } from "../shared.old/errors/db.error";
+import { DatabaseConnError } from "../errors/db.error";
 
 export type PgConnection =
   | PostgresDatabasePoolConn

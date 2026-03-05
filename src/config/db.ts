@@ -1,7 +1,7 @@
-import { PostgresDatabaseConn } from "../pg/postgresdb.service";
+import { PostgresDatabasePoolConn } from "@shared/services/postgresdb.service";
 import { env } from "./env";
 
-const db = new PostgresDatabaseConn(
+export const db = new PostgresDatabasePoolConn(
   {
     host: env.PG_HOST,
     port: env.PG_PORT,
@@ -14,5 +14,3 @@ const db = new PostgresDatabaseConn(
     connectionTimeoutMiliseconds: 2000,
   },
 );
-
-export default db;

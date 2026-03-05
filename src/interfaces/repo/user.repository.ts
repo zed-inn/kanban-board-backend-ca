@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { NoUserError, UserRepository } from "kanban";
-import { PostgresRepository } from "../../pg/postgres-repo.service";
+import { PostgresRepository } from "@shared/services/postgres-repo.service";
 
 export const UserModel = z.object({
   id: z.uuidv7("User Id is required."),

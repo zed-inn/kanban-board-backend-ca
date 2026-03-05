@@ -1,4 +1,4 @@
-import { ZodFastifyInstance } from "../../shared.old/types/zod-fastify";
+import { ZodFastifyInstance } from "../../shared/types/zod-fastify";
 import { BoardHandler, BoardMemberHandler } from "./board.handler";
 import {
   AddMemberBodySchema,
@@ -11,7 +11,7 @@ import {
   UpdateBoardOwnerBodySchema,
   UpdateBoardParamsSchema,
 } from "./board.schema";
-import { GlobalResponseSchema } from "../../shared.old/schema/global.schema";
+import { GlobalResponseSchema } from "../../shared/schema/global.schema";
 import { RestrictTo } from "../../shared.old/hook/restrict-access.hook";
 
 export const BoardRouter = async (router: ZodFastifyInstance) => {

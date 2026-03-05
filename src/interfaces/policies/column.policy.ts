@@ -3,7 +3,7 @@ import {
   ColumnPolicy,
   InvalidColumnPositionError,
 } from "kanban";
-import { PostgresPolicy } from "../../pg/postgres-policy.service";
+import { PostgresPolicy } from "@shared/services/postgres-policy.service";
 
 export class PostgresColumnPolicy
   extends PostgresPolicy

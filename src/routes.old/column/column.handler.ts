@@ -1,6 +1,6 @@
 import kanban from "../../shared.old/core";
-import { AuthPayloadSchema } from "../../shared.old/schema/auth-payload.schema";
-import { GlobalResponse } from "../../shared.old/schema/global.schema";
+import { AuthPayloadSchema } from "../../shared/schema/auth-payload.schema";
+import { GlobalResponse } from "../../shared/schema/global.schema";
 import { FastifyReply, FastifyRequest } from "fastify";
 import {
   CreateColumnBody,

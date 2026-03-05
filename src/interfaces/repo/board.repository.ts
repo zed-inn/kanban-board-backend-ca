@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PostgresRepository } from "../../pg/postgres-repo.service";
+import { PostgresRepository } from "@shared/services/postgres-repo.service";
 import { Board, BoardRepository, NoBoardError } from "kanban";
 
 export const BoardModel = z.object({

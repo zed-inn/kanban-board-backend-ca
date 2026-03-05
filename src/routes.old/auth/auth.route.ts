@@ -1,7 +1,7 @@
-import { ZodFastifyInstance } from "../../shared.old/types/zod-fastify";
+import { ZodFastifyInstance } from "../../shared/types/zod-fastify";
 import { AuthHandler } from "./auth.handler";
 import { LoginBodySchema, SignupBodySchema } from "./auth.schema";
-import { GlobalResponseSchema } from "../../shared.old/schema/global.schema";
+import { GlobalResponseSchema } from "../../shared/schema/global.schema";
 import { RestrictTo } from "../../shared.old/hook/restrict-access.hook";
 
 export const AuthRouter = async (router: ZodFastifyInstance) => {

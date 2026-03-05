@@ -1,10 +1,10 @@
 import { UnitOfWork } from "kanban";
-import { PostgresRepository as pgRepo } from "../../pg/postgres-repo.service";
-import { PostgresPolicy as pgPolicy } from "../../pg/postgres-policy.service";
+import { PostgresRepository as pgRepo } from "@shared/services/postgres-repo.service";
+import { PostgresPolicy as pgPolicy } from "@shared/services/postgres-policy.service";
 import {
   PgConnection,
   PostgresDatabasePoolConn,
-} from "../../pg/postgresdb.service";
+} from "@shared/services/postgresdb.service";
 
 export class PostgresUnitOfWork implements UnitOfWork {
   private readonly repoConn: { repo: pgRepo; conn: PgConnection }[] = [];

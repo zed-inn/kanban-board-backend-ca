@@ -4,7 +4,7 @@ import { pgUserRepo } from "../../interfaces.old/repo/user.repo";
 import {
   GlobalQuerySchema,
   GlobalResponseSchema,
-} from "../../shared.old/schema/global.schema";
+} from "../../shared/schema/global.schema";
 
 export const BoardModel = pgBoardRepo.model;
 export const UserModel = pgUserRepo.model;
