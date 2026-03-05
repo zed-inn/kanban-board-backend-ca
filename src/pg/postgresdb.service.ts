@@ -1,6 +1,10 @@
 import { Pool, PoolClient, QueryResult } from "pg";
 import { DatabaseConnError } from "../shared.old/errors/db.error";
 
+export type PgConnection =
+  | PostgresDatabasePoolConn
+  | PostgresDatabaseClientConn;
+
 export class PostgresDatabasePoolConn {
   protected readonly pool: Pool;
 
@@ -69,7 +73,7 @@ export class PostgresDatabasePoolConn {
     });
   }
 
-  public readonly transaction = async () => {
+  public readonly tclient = async () => {
     return new PostgresDatabaseClientConn(await this.pool.connect());
   };
 

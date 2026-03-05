@@ -1,8 +1,13 @@
-import {
-  PostgresDatabasePoolConn as pgPool,
-  PostgresDatabaseClientConn as pgClient,
-} from "./postgresdb.service";
+import { PgConnection } from "./postgresdb.service";
 
 export abstract class PostgresPolicy {
-  constructor(protected readonly client: pgPool | pgClient) {}
+  constructor(protected _client: PgConnection) {}
+
+  public set client(client: PgConnection) {
+    this._client = client;
+  }
+
+  public get client() {
+    return this._client;
+  }
 }

@@ -1,7 +1,4 @@
-import {
-  PostgresDatabasePoolConn as pgPool,
-  PostgresDatabaseClientConn as pgClient,
-} from "./postgresdb.service";
+import { PgConnection } from "./postgresdb.service";
 
 export abstract class PostgresRepository<T extends unknown = void> {
   protected readonly model?: unknown;
@@ -10,14 +7,22 @@ export abstract class PostgresRepository<T extends unknown = void> {
   protected readonly utils = new RepoUtils();
 
   constructor(
-    protected readonly client: pgPool | pgClient,
+    protected _client: PgConnection,
     protected readonly ctx: T,
   ) {}
 
   // Must be initiated only once
   public readonly initRepo = async () => {
-    await this.client.query(this.repoSchema);
+    await this._client.query(this.repoSchema);
   };
+
+  public set client(client: PgConnection) {
+    this._client = client;
+  }
+
+  public get client() {
+    return this._client;
+  }
 }
 
 class RepoUtils {
