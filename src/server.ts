@@ -1,16 +1,16 @@
-import db from "./config.old/db";
-import app from "./config.old/app";
-import { env } from "./config.old/env";
-import { initRepos } from "./shared.old/initializer/repo.initializer";
+import { env } from "@config/env";
+import app from "@config/fastify-app";
 import { setupIo } from "./io-server";
-import { AppRouter } from "./shared.old/router/app.router";
+import { db } from "@config/db";
+import { initRepo } from "./repo.init";
+import { AppRouter } from "./app.routes";
 
 const startServer = async () => {
   try {
     setupIo();
 
     await db.connect();
-    await initRepos();
+    initRepo();
 
     app.register(AppRouter);
     await app.listen({ port: env.PORT, host: env.HOST });

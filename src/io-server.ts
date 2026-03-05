@@ -1,5 +1,5 @@
-import app from "./config.old/app";
-import { io } from "./config.old/io";
+import app from "@config/fastify-app";
+import { io } from "@config/io-server";
 
 export const setupIo = () => {
   io.on("connection", async (socket) => {
