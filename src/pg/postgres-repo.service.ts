@@ -1,12 +1,11 @@
 import {
   PostgresDatabasePoolConn as pgPool,
   PostgresDatabaseClientConn as pgClient,
-  PostgresDatabaseQueryResult,
 } from "./postgresdb.service";
 
 export abstract class PostgresRepository<T extends unknown = void> {
-  protected abstract readonly model?: unknown;
-  protected abstract readonly PER_PAGE: number;
+  protected readonly model?: unknown;
+  protected readonly PER_PAGE?: number;
   protected abstract readonly repoSchema: string;
   protected readonly utils = new RepoUtils();
 
@@ -19,27 +18,6 @@ export abstract class PostgresRepository<T extends unknown = void> {
   public readonly initRepo = async () => {
     await this.client.query(this.repoSchema);
   };
-
-  protected readonly offsetPage = (page: number) => {
-    if (typeof page !== "number" || isNaN(page)) page = 1;
-    return (page - 1) * this.PER_PAGE;
-  };
-
-  protected readonly _select?: <T extends unknown, Z extends unknown>(
-    data: T,
-  ) => Promise<PostgresDatabaseQueryResult<Z>>;
-
-  protected readonly _insert?: <T extends unknown, Z extends unknown>(
-    data: T,
-  ) => Promise<PostgresDatabaseQueryResult<Z>>;
-
-  protected readonly _update?: <T extends unknown, Z extends unknown>(
-    data: T,
-  ) => Promise<PostgresDatabaseQueryResult<Z>>;
-
-  protected readonly _delete?: <T extends unknown, Z extends unknown>(
-    data: T,
-  ) => Promise<PostgresDatabaseQueryResult<Z>>;
 }
 
 class RepoUtils {
@@ -70,4 +48,7 @@ class RepoUtils {
 
     return result as T;
   };
+
+  public readonly createOffsetFn = (perPage: number) => (page: number) =>
+    (page - 1) * perPage;
 }

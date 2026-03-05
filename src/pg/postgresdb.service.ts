@@ -106,10 +106,10 @@ export class PostgresDatabaseClientConn {
   };
 }
 
-export class PostgresDatabaseQueryResult<T extends any = any> {
+export class PostgresDatabaseQueryResult {
   protected readonly rowCount: number;
 
-  constructor(protected readonly res: QueryResult<T | any>) {
+  constructor(protected readonly res: QueryResult<any>) {
     this.rowCount = this.res.rowCount ?? 0;
   }
 
