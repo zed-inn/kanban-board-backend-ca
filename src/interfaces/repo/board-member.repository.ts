@@ -15,7 +15,7 @@ export const BoardMemberModel = z.object({
 });
 
 export class PostgresBoardMemberRepository
-  extends PostgresRepository<{ page: number }>
+  extends PostgresRepository<{ page?: number }>
   implements MemberRepository
 {
   protected readonly PER_PAGE: number = 30;
@@ -47,7 +47,7 @@ export class PostgresBoardMemberRepository
   async getByUserId(userId: string): Promise<BoardMembership[]> {
     const res = await this.client.query(
       "SELECT * FROM board_members WHERE member_id = $1 ORDER BY updated_at OFFSET $2 LIMIT $3;",
-      [userId, this.offsetPage(this.ctx.page), this.PER_PAGE],
+      [userId, this.offsetPage(this.ctx.page ?? 1), this.PER_PAGE],
     );
     const memberships = res.rows.map(this.parseRow);
     return memberships.map((m) => new BoardMembership(m));

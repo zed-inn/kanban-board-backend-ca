@@ -14,7 +14,7 @@ export const ColumnModel = z.object({
 });
 
 export class PostgresColumnRepository
-  extends PostgresRepository<{ page: number }>
+  extends PostgresRepository<{ page?: number }>
   implements ColumnRepository
 {
   protected readonly PER_PAGE: number = 10;
@@ -54,7 +54,7 @@ export class PostgresColumnRepository
   async getByBoardId(boardId: string): Promise<Column[]> {
     const res = await this.client.query(
       "SELECT * FROM columns WHERE board_id = $1 ORDER BY position DESC OFFSET $2 LIMIT $3;",
-      [boardId, this.offsetPage(this.ctx.page), this.PER_PAGE],
+      [boardId, this.offsetPage(this.ctx.page ?? 1), this.PER_PAGE],
     );
 
     const columns = res.rows.map(this.parseRow);

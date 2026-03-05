@@ -13,7 +13,7 @@ export const BoardModel = z.object({
 });
 
 export class PostgresBoardRepository
-  extends PostgresRepository<{ page: number }>
+  extends PostgresRepository<{ page?: number }>
   implements BoardRepository
 {
   protected readonly model = BoardModel;
@@ -51,7 +51,7 @@ export class PostgresBoardRepository
   async getByIds(ids: string[]): Promise<Board[]> {
     const res = await this.client.query(
       "SELECT * FROM boards WHERE id = ANY($1) ORDER BY updated_at OFFSET $2 LIMIT $3;",
-      [ids, this.offsetPage(this.ctx.page), this.PER_PAGE],
+      [ids, this.offsetPage(this.ctx.page ?? 1), this.PER_PAGE],
     );
 
     const boards = res.rows.map(this.parseRow);
@@ -61,7 +61,7 @@ export class PostgresBoardRepository
   async getByOwnerId(userId: string): Promise<Board[]> {
     const res = await this.client.query(
       "SELECT * FROM boards WHERE owner_id = $1 ORDER BY updated_at OFFSET $2 LIMIT $3;",
-      [userId, this.offsetPage(this.ctx.page), this.PER_PAGE],
+      [userId, this.offsetPage(this.ctx.page ?? 1), this.PER_PAGE],
     );
 
     const boards = res.rows.map(this.parseRow);

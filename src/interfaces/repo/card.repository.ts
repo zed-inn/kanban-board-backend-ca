@@ -15,7 +15,7 @@ export const CardModel = z.object({
 });
 
 export class PostgresCardRepository
-  extends PostgresRepository<{ page: number }>
+  extends PostgresRepository<{ page?: number }>
   implements CardRepository
 {
   protected readonly PER_PAGE: number = 50;
@@ -55,7 +55,7 @@ export class PostgresCardRepository
   async getByColumnId(columnId: string): Promise<Card[]> {
     const res = await this.client.query(
       "SELECT * FROM cards WHERE column_id = $1 ORDER BY position DESC OFFSET $2 LIMIT $3;",
-      [columnId, this.offsetPage(this.ctx.page), this.PER_PAGE],
+      [columnId, this.offsetPage(this.ctx.page ?? 1), this.PER_PAGE],
     );
 
     const cards = res.rows.map(this.parseRow);

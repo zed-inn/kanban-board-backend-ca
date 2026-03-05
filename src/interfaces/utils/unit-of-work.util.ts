@@ -7,17 +7,21 @@ import {
 } from "@shared/services/postgresdb.service";
 
 export class PostgresUnitOfWork implements UnitOfWork {
-  private readonly repoConn: { repo: pgRepo; conn: PgConnection }[] = [];
+  private readonly repoConn: { repo: pgRepo<unknown>; conn: PgConnection }[] =
+    [];
   private readonly policyConn: { policy: pgPolicy; conn: PgConnection }[] = [];
 
   constructor(
     private dbconn: PostgresDatabasePoolConn,
-    repos: pgRepo[],
-    policies: pgPolicy[],
+    repos?: pgRepo<unknown>[],
+    policies?: pgPolicy[],
   ) {
-    for (const r of repos) this.repoConn.push({ repo: r, conn: r.client });
-    for (const p of policies)
-      this.policyConn.push({ policy: p, conn: p.client });
+    if (repos)
+      for (const r of repos) this.repoConn.push({ repo: r, conn: r.client });
+
+    if (policies)
+      for (const p of policies)
+        this.policyConn.push({ policy: p, conn: p.client });
   }
 
   async atomic<T>(work: () => Promise<T>): Promise<T> {
