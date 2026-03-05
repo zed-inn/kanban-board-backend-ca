@@ -1,11 +1,9 @@
 import { z } from "zod";
-import { pgColumnRepo } from "../../interfaces.old/repo/column.repo";
 import {
   GlobalQuerySchema,
   GlobalResponseSchema,
 } from "../../shared/schema/global.schema";
-
-export const ColumnModel = pgColumnRepo.model;
+import { ColumnModel } from "@interfaces/repo/column.repository";
 
 export const CreateColumnBodySchema = ColumnModel.pick({ name: true });
 export type CreateColumnBody = z.infer<typeof CreateColumnBodySchema>;

@@ -1,13 +1,10 @@
 import { z } from "zod";
-import { pgCardRepo } from "../../interfaces.old/repo/card.repo";
-import { pgColumnRepo } from "../../interfaces.old/repo/column.repo";
 import {
   GlobalQuerySchema,
   GlobalResponseSchema,
 } from "../../shared/schema/global.schema";
-
-export const CardModel = pgCardRepo.model;
-export const ColumnModel = pgColumnRepo.model;
+import { CardModel } from "@interfaces/repo/card.repository";
+import { ColumnModel } from "@interfaces/repo/column.repository";
 
 export const CreateCardBodySchema = CardModel.pick({
   title: true,

@@ -1,25 +1,25 @@
-import { ZodFastifyInstance } from "../../shared/types/zod-fastify";
+import { ZodFastifyInstance } from "@shared/types/zod-fastify";
 import { CardHandler } from "./card.handler";
 import {
   CreateCardBodySchema,
   CreateCardParamsSchema,
   DeleteCardParamsSchema,
   GetCardsParamsSchema,
+  GetCardsQuerySchema,
   GetCardsResponseSchema,
   UpdateCardBodyBodySchema,
   UpdateCardLocationBodySchema,
   UpdateCardParamsSchema,
 } from "./card.schema";
-import { GlobalResponseSchema } from "../../shared/schema/global.schema";
-import { RestrictTo } from "../../shared.old/hook/restrict-access.hook";
-import { GetBoardsQuerySchema } from "@routes/board/board.schema";
+import { GlobalResponseSchema } from "@shared/schema/global.schema";
+import { RestrictTo } from "@shared/middlewares/fastify-restrict-access.hook";
 
 export const CardRouter = async (router: ZodFastifyInstance) => {
   router.get(
     "/",
     {
       schema: {
-        querystring: GetBoardsQuerySchema,
+        querystring: GetCardsQuerySchema,
         params: GetCardsParamsSchema,
         response: { 200: GetCardsResponseSchema },
       },

@@ -1,4 +1,4 @@
-import { ZodFastifyInstance } from "../../shared/types/zod-fastify";
+import { ZodFastifyInstance } from "@shared/types/zod-fastify";
 import { ColumnHandler } from "./column.handler";
 import {
   CreateColumnBodySchema,
@@ -11,8 +11,8 @@ import {
   UpdateColumnParamsSchema,
   UpdateColumnPositionBodySchema,
 } from "./column.schema";
-import { GlobalResponseSchema } from "../../shared/schema/global.schema";
-import { RestrictTo } from "../../shared.old/hook/restrict-access.hook";
+import { GlobalResponseSchema } from "@shared/schema/global.schema";
+import { RestrictTo } from "@shared/middlewares/fastify-restrict-access.hook";
 
 export const ColumnRouter = async (router: ZodFastifyInstance) => {
   router.get(
