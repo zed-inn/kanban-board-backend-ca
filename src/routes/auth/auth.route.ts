@@ -10,7 +10,7 @@ export const AuthRouter = async (router: ZodFastifyInstance) => {
     {
       schema: {
         body: LoginBodySchema,
-        response: { 200: GlobalResponseSchema },
+        response: { 200: GlobalResponseSchema() },
       },
     },
     AuthHandler.login,
@@ -21,7 +21,7 @@ export const AuthRouter = async (router: ZodFastifyInstance) => {
     {
       schema: {
         body: SignupBodySchema,
-        response: { 201: GlobalResponseSchema },
+        response: { 201: GlobalResponseSchema() },
       },
     },
     AuthHandler.signup,

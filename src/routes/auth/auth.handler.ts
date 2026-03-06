@@ -4,7 +4,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { LoginBody, SignupBody } from "./auth.schema";
 import { PostgresUserRepository } from "@interfaces/repo/user.repository";
 import { db } from "@config/db";
-import { EmailAlreadyUserError, PasswordNotMatchedError } from "./auth.error";
+import { EmailAlreadyUsedError, PasswordNotMatchedError } from "./auth.error";
 import { AuthTokenService } from "@shared/services/auth-token.service";
 import { env } from "@config/env";
 import { UUIDGenerator } from "@interfaces/utils/id-generator.util";
@@ -48,7 +48,7 @@ export class AuthHandler {
     const idGenerator = new UUIDGenerator();
 
     const userExists = await userRepo.existsByEmail(b.email);
-    if (userExists) throw new EmailAlreadyUserError();
+    if (userExists) throw new EmailAlreadyUsedError();
 
     const userId = await idGenerator.generateUnique();
     const passwordHash = await bcrypt.hash(b.password, 10);
