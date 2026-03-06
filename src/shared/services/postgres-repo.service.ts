@@ -26,32 +26,22 @@ export abstract class PostgresRepository<T extends unknown = void> {
 }
 
 class RepoUtils {
-  public readonly camelize = <T extends Record<string, any>>(obj: T): T => {
-    if (obj === null || typeof obj !== "object" || Array.isArray(obj))
-      return obj;
+  public readonly camelize = (snakeCasedObj: Record<string, unknown>) => {
+    const camelCasedObj: Record<string, unknown> = {};
 
-    const result: Record<string, any> = {};
-
-    for (const key of Object.keys(obj)) {
-      const camelKey = key.replace(/_([a-zA-Z0-9])/g, (_, c) =>
-        c.toUpperCase(),
-      );
-      const val = (obj as any)[key];
-
-      if (val && typeof val === "object" && !Array.isArray(val)) {
-        result[camelKey] = this.camelize(val);
-      } else if (Array.isArray(val)) {
-        result[camelKey] = val.map((item) =>
-          item && typeof item === "object" && !Array.isArray(item)
-            ? this.camelize(item)
-            : item,
-        );
-      } else {
-        result[camelKey] = val;
-      }
+    for (const [key, value] of Object.entries(snakeCasedObj)) {
+      const keyWords = key.split("_");
+      const newKey = keyWords
+        .map((w, i) =>
+          i === 0 || w.length < 1
+            ? w
+            : `${w.at(0)?.toUpperCase()}${w.slice(1)}`,
+        )
+        .join("");
+      camelCasedObj[newKey] = value;
     }
 
-    return result as T;
+    return camelCasedObj;
   };
 
   public readonly createOffsetFn = (perPage: number) => (page: number) =>
