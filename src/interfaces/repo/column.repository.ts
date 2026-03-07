@@ -7,7 +7,9 @@ export const ColumnModel = z.object({
   name: z
     .string("Column name is required.")
     .min(1, "Valid column name must not be empty."),
-  position: z.number("Valid position is required."),
+  position: z
+    .number("Valid position is required.")
+    .or(z.coerce.number("Valid position is required.")),
   boardId: z.uuidv7("Board id is required."),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -53,7 +55,7 @@ export class PostgresColumnRepository
 
   async getByBoardId(boardId: string): Promise<Column[]> {
     const res = await this.client.query(
-      "SELECT * FROM columns WHERE board_id = $1 ORDER BY position DESC OFFSET $2 LIMIT $3;",
+      "SELECT * FROM columns WHERE board_id = $1 ORDER BY position ASC OFFSET $2 LIMIT $3;",
       [boardId, this.offsetPage(this.ctx.page ?? 1), this.PER_PAGE],
     );
 
@@ -87,7 +89,7 @@ export class PostgresColumnRepository
   }
 
   async save(column: Column): Promise<void> {
-    const exists = this.exists(column.id);
+    const exists = await this.exists(column.id);
     if (!exists)
       await this.client.query(
         "INSERT INTO columns(id, name, position, board_id) VALUES($1, $2, $3, $4) RETURNING *;",
@@ -106,7 +108,7 @@ export class PostgresColumnRepository
   }
 
   async remove(column: Column): Promise<void> {
-    const exists = this.exists(column.id);
+    const exists = await this.exists(column.id);
     if (!exists) throw new NoColumnError();
 
     await this.client.query("DELETE FROM columns WHERE id = $1 RETURNING *;", [

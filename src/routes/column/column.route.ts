@@ -34,7 +34,7 @@ export const ColumnRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: CreateColumnBodySchema,
         params: CreateColumnParamsSchema,
-        response: { 201: GlobalResponseSchema },
+        response: { 201: GlobalResponseSchema() },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
@@ -47,7 +47,7 @@ export const ColumnRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: UpdateColumnNameBodySchema,
         params: UpdateColumnParamsSchema,
-        response: { 200: GlobalResponseSchema },
+        response: { 200: GlobalResponseSchema() },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
@@ -60,7 +60,7 @@ export const ColumnRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: UpdateColumnPositionBodySchema,
         params: UpdateColumnParamsSchema,
-        response: { 200: GlobalResponseSchema },
+        response: { 200: GlobalResponseSchema() },
       },
       preHandler: [RestrictTo.loggedInUser],
     },

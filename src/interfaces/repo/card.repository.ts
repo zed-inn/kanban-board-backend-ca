@@ -8,7 +8,9 @@ export const CardModel = z.object({
     .string("Card title is required.")
     .min(1, "Valid Card title must not be empty."),
   content: z.string("Valid card content is required").nullable().default(null),
-  position: z.number("Valid position is required."),
+  position: z
+    .number("Valid position is required.")
+    .or(z.coerce.number("Valid position is required.")),
   columnId: z.uuidv7("Column id is required."),
   createdAt: z.date(),
   updatedAt: z.date(),

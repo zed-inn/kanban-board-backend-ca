@@ -40,6 +40,6 @@ export const GetColumnParamsSchema = ColumnModel.pick({
 export type GetColumnParams = z.infer<typeof GetColumnParamsSchema>;
 
 export const GetColumnResponseSchema = GlobalResponseSchema({
-  columns: z.array(ColumnModel),
+  columns: z.array(ColumnModel.omit({ createdAt: true, updatedAt: true })),
 });
 export type GetColumnResponse = z.infer<typeof GetColumnResponseSchema>;
