@@ -34,7 +34,7 @@ export const CardRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: CreateCardBodySchema,
         params: CreateCardParamsSchema,
-        response: { 201: GlobalResponseSchema },
+        response: { 201: GlobalResponseSchema() },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
@@ -47,27 +47,27 @@ export const CardRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: UpdateCardBodyBodySchema,
         params: UpdateCardParamsSchema,
-        response: { 200: GlobalResponseSchema },
+        response: { 200: GlobalResponseSchema() },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
     CardHandler.updateCardBody,
   );
 
-  router.post(
+  router.patch(
     "/:id/location",
     {
       schema: {
         body: UpdateCardLocationBodySchema,
         params: UpdateCardParamsSchema,
-        response: { 200: GlobalResponseSchema },
+        response: { 200: GlobalResponseSchema() },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
     CardHandler.updateCardLocation,
   );
 
-  router.post(
+  router.delete(
     "/:id",
     {
       schema: {

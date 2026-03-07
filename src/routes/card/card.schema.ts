@@ -20,7 +20,7 @@ export type CreateCardParams = z.infer<typeof CreateCardParamsSchema>;
 export const UpdateCardBodyBodySchema = CardModel.pick({
   title: true,
   content: true,
-});
+}).partial();
 export type UpdateCardBodyBody = z.infer<typeof UpdateCardBodyBodySchema>;
 
 export const UpdateCardLocationBodySchema = CardModel.pick({ id: true });
@@ -49,6 +49,6 @@ export const GetCardsParamsSchema = CardModel.pick({ columnId: true }).extend(
 export type GetCardsParams = z.infer<typeof GetCardsParamsSchema>;
 
 export const GetCardsResponseSchema = GlobalResponseSchema({
-  cards: z.array(CardModel),
+  cards: z.array(CardModel.omit({ createdAt: true, updatedAt: true })),
 });
 export type GetCardsResponse = z.infer<typeof GetCardsResponseSchema>;

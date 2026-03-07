@@ -56,7 +56,7 @@ export class PostgresCardRepository
 
   async getByColumnId(columnId: string): Promise<Card[]> {
     const res = await this.client.query(
-      "SELECT * FROM cards WHERE column_id = $1 ORDER BY position DESC OFFSET $2 LIMIT $3;",
+      "SELECT * FROM cards WHERE column_id = $1 ORDER BY position ASC OFFSET $2 LIMIT $3;",
       [columnId, this.offsetPage(this.ctx.page ?? 1), this.PER_PAGE],
     );
 
