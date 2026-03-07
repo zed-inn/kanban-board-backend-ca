@@ -44,7 +44,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
     {
       schema: {
         body: CreateBoardBodySchema,
-        response: { 201: GlobalResponseSchema },
+        response: { 201: GlobalResponseSchema() },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
@@ -57,7 +57,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: UpdateBoardNameBodySchema,
         params: UpdateBoardParamsSchema,
-        response: { 200: GlobalResponseSchema },
+        response: { 200: GlobalResponseSchema() },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
@@ -70,7 +70,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: UpdateBoardOwnerBodySchema,
         params: UpdateBoardParamsSchema,
-        response: { 200: GlobalResponseSchema },
+        response: { 200: GlobalResponseSchema() },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
@@ -95,7 +95,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: AddMemberBodySchema,
         params: MemberParamsSchema,
-        response: { 201: GlobalResponseSchema },
+        response: { 201: GlobalResponseSchema() },
       },
       preHandler: [RestrictTo.loggedInUser],
     },

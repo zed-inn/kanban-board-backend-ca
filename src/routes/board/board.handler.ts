@@ -30,6 +30,7 @@ import { PostgresUnitOfWork } from "@interfaces/utils/unit-of-work.util";
 import { PostgresBoardMemberPolicy } from "@interfaces/policies/board-member.policy";
 import { IoEventEmitter } from "@interfaces/emitter/event.emitter";
 import { io } from "@config/io-server";
+import { PostgresUserRepository } from "@interfaces/repo/user.repository";
 
 export class BoardHandler {
   static getBoardsMemberOf = async (
@@ -184,18 +185,20 @@ export class BoardMemberHandler {
       p = req.params;
     const user = AuthPayloadSchema.parse(req.user);
 
+    const userRepo = new PostgresUserRepository(db);
     const boardRepo = new PostgresBoardRepository(db, {});
     const memberRepo = new PostgresBoardMemberRepository(db, {});
     const memberPolicy = new PostgresBoardMemberPolicy(db);
     const eventEmitter = new IoEventEmitter(io);
 
+    const userToBeJoined = await userRepo.getByEmail(b.email);
     const addMember = new AddMember(
       boardRepo,
       memberRepo,
       memberPolicy,
       eventEmitter,
     );
-    await addMember.execute(p.id, user.id, b.id);
+    await addMember.execute(p.id, user.id, userToBeJoined.id);
 
     reply.status(201);
     return { message: "Member added." };

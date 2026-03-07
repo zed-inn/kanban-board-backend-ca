@@ -21,7 +21,7 @@ export type UpdateBoardParams = z.infer<typeof UpdateBoardParamsSchema>;
 export const DeleteBoardParamsSchema = BoardModel.pick({ id: true });
 export type DeleteBoardParams = z.infer<typeof DeleteBoardParamsSchema>;
 
-export const AddMemberBodySchema = UserModel.pick({ id: true });
+export const AddMemberBodySchema = UserModel.pick({ email: true });
 export type AddMemberBody = z.infer<typeof AddMemberBodySchema>;
 
 export const MemberParamsSchema = BoardModel.pick({ id: true });
@@ -33,6 +33,6 @@ export const GetBoardsQuerySchema = GlobalQuerySchema.pick({
 export type GetBoardsQuery = z.infer<typeof GetBoardsQuerySchema>;
 
 export const GetBoardsResponseSchema = GlobalResponseSchema({
-  boards: z.array(BoardModel),
+  boards: z.array(BoardModel.omit({ updatedAt: true, createdAt: true })),
 });
 export type GetBoardsResponse = z.infer<typeof GetBoardsResponseSchema>;
