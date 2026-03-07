@@ -7,8 +7,8 @@ import { CardRouter } from "./routes/card/card.route";
 const routes: Record<string, (router: ZodFastifyInstance) => Promise<void>> = {
   "/auth": AuthRouter,
   "/board": BoardRouter,
-  "/board/:boardId": ColumnRouter,
-  "/board/:boardId/column/:columnId": CardRouter,
+  "/board/:boardId/column": ColumnRouter,
+  "/board/:boardId/column/:columnId/card": CardRouter,
 };
 
 const router = async (app: ZodFastifyInstance) => {
