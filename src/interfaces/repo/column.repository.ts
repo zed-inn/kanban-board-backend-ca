@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { Column, ColumnRepository, NoColumnError } from "kanban";
 import { PostgresRepository } from "@shared/services/postgres-repo.service";
+import { ColumnConstants } from "kanban/src/core/interfaces/constants/column.constant";
 
 export const ColumnModel = z.object({
   id: z.uuidv7("Column id is required."),
@@ -17,8 +18,9 @@ export const ColumnModel = z.object({
 
 export class PostgresColumnRepository
   extends PostgresRepository<{ page?: number }>
-  implements ColumnRepository
+  implements ColumnRepository, ColumnConstants
 {
+  readonly POSITION_GAP: number = 100;
   protected readonly PER_PAGE: number = 10;
   protected readonly model = ColumnModel;
   protected readonly repoSchema: string = `CREATE TABLE IF NOT EXISTS columns (
@@ -80,6 +82,20 @@ export class PostgresColumnRepository
   ): Promise<Column | null> {
     const res = await this.client.query(
       "SELECT * FROM columns WHERE board_id = $1 AND position > $2 ORDER BY position ASC LIMIT 1;",
+      [boardId, position],
+    );
+    if (res.none) return null;
+
+    const column = this.parseRow(res.top);
+    return new Column(column);
+  }
+
+  async getBottomColumnAbovePositionInBoard(
+    position: number,
+    boardId: string,
+  ): Promise<Column | null> {
+    const res = await this.client.query(
+      "SELECT * FROM columns WHERE board_id = $1 AND position < $2 ORDER BY position DESC LIMIT 1;",
       [boardId, position],
     );
     if (res.none) return null;

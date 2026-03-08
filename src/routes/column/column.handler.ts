@@ -69,6 +69,7 @@ export class ColumnHandler {
 
     const addColumn = new AddColumn(
       idGenerator,
+      columnRepo,
       memberRepo,
       columnRepo,
       memberPolicy,
@@ -126,6 +127,7 @@ export class ColumnHandler {
     const eventEmitter = new IoEventEmitter(io);
 
     const reorderColumn = new ReorderColumn(
+      columnRepo,
       memberRepo,
       columnRepo,
       memberPolicy,

@@ -27,7 +27,6 @@ import { UUIDGenerator } from "@interfaces/utils/id-generator.util";
 import { PostgresBoardMemberRepository } from "@interfaces/repo/board-member.repository";
 import { IoEventEmitter } from "@interfaces/emitter/event.emitter";
 import { io } from "@config/io-server";
-import { PostgresCardPolicy } from "@interfaces/policies/card.policy";
 
 export class CardHandler {
   static getCardsInColumn = async (
@@ -73,6 +72,7 @@ export class CardHandler {
 
     const addCard = new AddCard(
       idGenerator,
+      cardRepo,
       memberRepo,
       cardRepo,
       memberPolicy,
@@ -108,7 +108,10 @@ export class CardHandler {
     );
     await updateCardBody.execute(
       p.id,
-      { title: b.title, ...(b.content ? { content: b.content } : {}) },
+      {
+        ...(b.title ? { title: b.title } : {}),
+        ...(b.content || b.content === null ? { content: b.content } : {}),
+      },
       p.columnId,
       p.boardId,
       user.id,
@@ -133,18 +136,26 @@ export class CardHandler {
     const cardRepo = new PostgresCardRepository(db, {});
     const memberPolicy = new PostgresBoardMemberPolicy(db);
     const columnPolicy = new PostgresColumnPolicy(db);
-    const cardPolicy = new PostgresCardPolicy(db);
     const eventEmitter = new IoEventEmitter(io);
 
     const reorderCard = new ReorderCard(
+      cardRepo,
       memberRepo,
       cardRepo,
       memberPolicy,
       columnPolicy,
-      cardPolicy,
       eventEmitter,
     );
-    await reorderCard.execute(p.id, b.id, p.columnId, p.boardId, user.id);
+    await reorderCard.execute(
+      p.id,
+      {
+        ...(b.id ? { iPOCardId: b.id } : {}),
+        ...(b.columnId ? { columnId: b.columnId } : {}),
+      },
+      p.columnId,
+      p.boardId,
+      user.id,
+    );
 
     reply.status(200);
     return { message: "Card reordered." };

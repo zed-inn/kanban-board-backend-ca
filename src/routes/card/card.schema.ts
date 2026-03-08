@@ -23,7 +23,10 @@ export const UpdateCardBodyBodySchema = CardModel.pick({
 }).partial();
 export type UpdateCardBodyBody = z.infer<typeof UpdateCardBodyBodySchema>;
 
-export const UpdateCardLocationBodySchema = CardModel.pick({ id: true });
+export const UpdateCardLocationBodySchema = CardModel.pick({
+  id: true,
+  columnId: true,
+}).partial();
 export type UpdateCardLocationBody = z.infer<
   typeof UpdateCardLocationBodySchema
 >;

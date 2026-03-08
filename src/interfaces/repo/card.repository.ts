@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { Card, CardRepository, NoCardError } from "kanban";
 import { PostgresRepository } from "@shared/services/postgres-repo.service";
+import { CardConstant } from "kanban/src/core/interfaces/constants/card.constant";
 
 export const CardModel = z.object({
   id: z.uuidv7("Card id is required."),
@@ -18,8 +19,9 @@ export const CardModel = z.object({
 
 export class PostgresCardRepository
   extends PostgresRepository<{ page?: number }>
-  implements CardRepository
+  implements CardRepository, CardConstant
 {
+  readonly POSITION_GAP: number = 100;
   protected readonly PER_PAGE: number = 50;
   protected readonly model = CardModel;
   protected readonly repoSchema: string = `CREATE TABLE IF NOT EXISTS cards (
@@ -81,6 +83,20 @@ export class PostgresCardRepository
   ): Promise<Card | null> {
     const res = await this.client.query(
       "SELECT * FROM cards WHERE column_id = $1 AND position > $2 ORDER BY position ASC LIMIT 1;",
+      [columnId, position],
+    );
+    if (res.none) return null;
+
+    const card = this.parseRow(res.top);
+    return new Card(card);
+  }
+
+  async getBottomCardAbovePositionInColumn(
+    position: number,
+    columnId: string,
+  ): Promise<Card | null> {
+    const res = await this.client.query(
+      "SELECT * FROM cards WHERE column_id = $1 AND position < $2 ORDER BY position DESC LIMIT 1;",
       [columnId, position],
     );
     if (res.none) return null;
