@@ -22,7 +22,7 @@ export class PostgresColumnQuery
     pagination: KeysetPagination<string>,
   ): Promise<PaginatedResult<ColumnReadModel>> {
     const res = await this.client.query(
-      `SELECT * FROM columns WHERE board_id = $1 ${pagination.cursor ? ", position < $2" : ""} ORDER BY position DESC LIMIT $${pagination.cursor ? "3" : "2"};`,
+      `SELECT * FROM columns WHERE board_id = $1 ${pagination.cursor ? "AND position < $2" : ""} ORDER BY position DESC LIMIT $${pagination.cursor ? "3" : "2"};`,
       pagination.cursor
         ? [boardId.v, pagination.cursor, pagination.limit]
         : [boardId.v, pagination.limit],

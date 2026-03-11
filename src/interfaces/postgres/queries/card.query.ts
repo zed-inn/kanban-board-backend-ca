@@ -19,7 +19,7 @@ export class PostgresCardQuery extends PostgresRepository implements CardQuery {
     pagination: KeysetPagination<string>,
   ): Promise<PaginatedResult<CardReadModel>> {
     const res = await this.client.query(
-      `SELECT * FROM cards WHERE column_id = $1 ${pagination.cursor ? ", position < $2" : ""} ORDER BY position DESC LIMIT $${pagination.cursor ? "3" : "2"};`,
+      `SELECT * FROM cards WHERE column_id = $1 ${pagination.cursor ? "AND position < $2" : ""} ORDER BY position DESC LIMIT $${pagination.cursor ? "3" : "2"};`,
       pagination.cursor
         ? [columnId.v, pagination.cursor, pagination.limit]
         : [columnId.v, pagination.limit],
