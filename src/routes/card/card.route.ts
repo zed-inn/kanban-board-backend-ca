@@ -11,8 +11,8 @@ import {
   UpdateCardLocationBodySchema,
   UpdateCardParamsSchema,
 } from "./card.schema";
-import { GlobalResponseSchema } from "@shared/schema/global.schema";
-import { RestrictTo } from "@shared/middlewares/fastify-restrict-access.hook";
+import { GlobalResponseMessageSchema } from "@shared/schema/global-response.schema";
+import { RestrictTo } from "@shared/hooks/restrict-to.hook";
 
 export const CardRouter = async (router: ZodFastifyInstance) => {
   router.get(
@@ -34,7 +34,7 @@ export const CardRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: CreateCardBodySchema,
         params: CreateCardParamsSchema,
-        response: { 201: GlobalResponseSchema() },
+        response: { 201: GlobalResponseMessageSchema },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
@@ -47,7 +47,7 @@ export const CardRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: UpdateCardBodyBodySchema,
         params: UpdateCardParamsSchema,
-        response: { 200: GlobalResponseSchema() },
+        response: { 200: GlobalResponseMessageSchema },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
@@ -60,7 +60,7 @@ export const CardRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: UpdateCardLocationBodySchema,
         params: UpdateCardParamsSchema,
-        response: { 200: GlobalResponseSchema() },
+        response: { 200: GlobalResponseMessageSchema },
       },
       preHandler: [RestrictTo.loggedInUser],
     },

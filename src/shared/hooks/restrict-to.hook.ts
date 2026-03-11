@@ -1,4 +1,4 @@
-import { UserNotLoggedInError } from "../errors/auth.error";
+import { UserNotLoggedInError } from "@shared/errors/auth.error";
 import { FastifyRequest } from "fastify";
 
 export class RestrictTo {

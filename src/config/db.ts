@@ -1,4 +1,4 @@
-import { PostgresDatabasePoolConn } from "@shared/services/postgresdb.service";
+import { PostgresDatabasePoolConn } from "@shared/services/postgres/postgresdb.service";
 import { env } from "./env";
 
 export const db = new PostgresDatabasePoolConn(

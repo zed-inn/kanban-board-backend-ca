@@ -1,4 +1,4 @@
-import { AuthTokenService } from "../services/auth-token.service";
+import { AuthTokenService } from "@shared/services/auth/auth-token.service";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
 

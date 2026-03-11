@@ -1,8 +1,8 @@
 import { ZodFastifyInstance } from "@shared/types/zod-fastify";
-import { AuthRouter } from "./routes/auth/auth.route";
-import { BoardRouter } from "./routes/board/board.route";
-import { ColumnRouter } from "./routes/column/column.route";
-import { CardRouter } from "./routes/card/card.route";
+import { AuthRouter } from "./auth/auth.route";
+import { BoardRouter } from "./board/board.route";
+import { ColumnRouter } from "./column/column.route";
+import { CardRouter } from "./card/card.route";
 
 const routes: Record<string, (router: ZodFastifyInstance) => Promise<void>> = {
   "/auth": AuthRouter,

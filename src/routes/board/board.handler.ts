@@ -11,219 +11,146 @@ import {
   UpdateBoardParams,
 } from "./board.schema";
 import { AuthPayloadSchema } from "@shared/schema/auth-payload.schema";
-import { PostgresBoardRepository } from "@interfaces/repo/board.repository";
-import { db } from "@config/db";
-import { PostgresBoardMemberRepository } from "@interfaces/repo/board-member.repository";
-import {
-  AddMember,
-  ChangeOwner,
-  CreateBoard,
-  DeleteBoard,
-  GetMemberBoards,
-  GetOwnedBoards,
-  RemoveMember,
-  RenameBoard,
-} from "kanban";
-import { GlobalResponse } from "@shared/schema/global.schema";
-import { UUIDGenerator } from "@interfaces/utils/id-generator.util";
-import { PostgresUnitOfWork } from "@interfaces/utils/unit-of-work.util";
-import { PostgresBoardMemberPolicy } from "@interfaces/policies/board-member.policy";
-import { IoEventEmitter } from "@interfaces/emitter/event.emitter";
-import { io } from "@config/io-server";
-import { PostgresUserRepository } from "@interfaces/repo/user.repository";
+import { GlobalResponseMessage } from "@shared/schema/global-response.schema";
+import { kanban, userRepo } from "@config/core";
+import { PER_PAGE } from "@constants/pagination";
 
 export class BoardHandler {
-  static getBoardsMemberOf = async (
+  static async getMemberBoards(
     req: FastifyRequest<{ Querystring: GetBoardsQuery }>,
     reply: FastifyReply,
-  ): Promise<GetBoardsResponse> => {
+  ): Promise<GetBoardsResponse> {
     const q = req.query;
     const user = AuthPayloadSchema.parse(req.user);
 
-    const boardRepo = new PostgresBoardRepository(db, {});
-    const memberRepo = new PostgresBoardMemberRepository(db, { page: q.page });
-
-    const getMemberBoards = new GetMemberBoards(boardRepo, memberRepo);
-    const boards = await getMemberBoards.execute(user.id);
+    const res = await kanban.getMemberBoards.execute({
+      memberId: user.id,
+      pagination: { cursor: q.updatedAt, limit: PER_PAGE.boards },
+    });
 
     reply.status(200);
     return {
       message: "Boards fetched.",
-      data: { boards: boards.map((b) => b.attrbs) },
+      data: { boards: res.data, nextCursor: res.nextCursor as any },
     };
-  };
+  }
 
-  static getOwnedBoards = async (
+  static async getOwnedBoards(
     req: FastifyRequest<{ Querystring: GetBoardsQuery }>,
     reply: FastifyReply,
-  ): Promise<GetBoardsResponse> => {
+  ): Promise<GetBoardsResponse> {
     const q = req.query;
     const user = AuthPayloadSchema.parse(req.user);
 
-    const boardRepo = new PostgresBoardRepository(db, { page: q.page });
-
-    const getOwnedBoards = new GetOwnedBoards(boardRepo);
-    const boards = await getOwnedBoards.execute(user.id);
+    const res = await kanban.getOwnerBoards.execute({
+      ownerId: user.id,
+      pagination: { limit: PER_PAGE.boards },
+    });
 
     reply.status(200);
     return {
       message: "Boards fetched.",
-      data: { boards: boards.map((b) => b.attrbs) },
+      data: { boards: res.data, nextCursor: res.nextCursor as any },
     };
-  };
+  }
 
-  static createBoard = async (
+  static async createBoard(
     req: FastifyRequest<{ Body: CreateBoardBody }>,
     reply: FastifyReply,
-  ): Promise<GlobalResponse> => {
+  ): Promise<GlobalResponseMessage> {
     const b = req.body;
     const user = AuthPayloadSchema.parse(req.user);
 
-    const boardRepo = new PostgresBoardRepository(db, {});
-    const memberRepo = new PostgresBoardMemberRepository(db, {});
-    const idGenerator = new UUIDGenerator();
-    const unitOfWork = new PostgresUnitOfWork(db, [boardRepo, memberRepo], []);
-
-    const createBoard = new CreateBoard(
-      unitOfWork,
-      idGenerator,
-      boardRepo,
-      memberRepo,
-    );
-    await createBoard.execute(b.name, user.id);
+    await kanban.createBoard.execute({ name: b.name, userId: user.id });
 
     reply.status(201);
     return { message: "Board created." };
-  };
+  }
 
-  static updateBoardName = async (
+  static async updateBoardName(
     req: FastifyRequest<{
       Body: UpdateBoardNameBody;
       Params: UpdateBoardParams;
     }>,
     reply: FastifyReply,
-  ): Promise<GlobalResponse> => {
+  ): Promise<GlobalResponseMessage> {
     const b = req.body,
       p = req.params;
     const user = AuthPayloadSchema.parse(req.user);
 
-    const boardRepo = new PostgresBoardRepository(db, {});
-    const memberRepo = new PostgresBoardMemberRepository(db, {});
-    const memberPolicy = new PostgresBoardMemberPolicy(db);
-    const eventemitter = new IoEventEmitter(io);
-
-    const renameBoard = new RenameBoard(
-      boardRepo,
-      memberRepo,
-      memberPolicy,
-      eventemitter,
-    );
-    await renameBoard.execute(p.id, user.id, b.name);
+    await kanban.renameBoard.execute({
+      boardId: p.id,
+      memberId: user.id,
+      name: b.name,
+    });
 
     reply.status(200);
     return { message: "Board renamed." };
-  };
+  }
 
-  static updateBoardOwner = async (
+  static async updateBoardOwner(
     req: FastifyRequest<{
       Body: UpdateBoardOwnerBody;
       Params: UpdateBoardParams;
     }>,
     reply: FastifyReply,
-  ): Promise<GlobalResponse> => {
+  ): Promise<GlobalResponseMessage> {
     const b = req.body,
       p = req.params;
     const user = AuthPayloadSchema.parse(req.user);
 
-    const boardRepo = new PostgresBoardRepository(db, {});
-    const memberRepo = new PostgresBoardMemberRepository(db, {});
-    const memberPolicy = new PostgresBoardMemberPolicy(db);
-    const eventemitter = new IoEventEmitter(io);
-
-    const changeOwner = new ChangeOwner(
-      boardRepo,
-      memberRepo,
-      memberPolicy,
-      eventemitter,
-    );
-    await changeOwner.execute(p.id, user.id, b.id);
+    await kanban.changeOwnerOfBoard.execute({
+      boardId: p.id,
+      memberId: b.id,
+      ownerId: user.id,
+    });
 
     reply.status(200);
     return { message: "Board owner changed." };
-  };
+  }
 
-  static deleteBoard = async (
+  static async deleteBoard(
     req: FastifyRequest<{ Params: DeleteBoardParams }>,
     reply: FastifyReply,
-  ): Promise<void> => {
+  ): Promise<void> {
     const p = req.params;
     const user = AuthPayloadSchema.parse(req.user);
 
-    const boardRepo = new PostgresBoardRepository(db, {});
-    const memberRepo = new PostgresBoardMemberRepository(db, {});
-    const eventemitter = new IoEventEmitter(io);
-    const unitOfWork = new PostgresUnitOfWork(db, [boardRepo, memberRepo], []);
-
-    const deleteBoard = new DeleteBoard(
-      unitOfWork,
-      boardRepo,
-      memberRepo,
-      eventemitter,
-    );
-    await deleteBoard.execute(p.id, user.id);
+    await kanban.deleteBoard.execute({ boardId: p.id, userId: user.id });
 
     reply.status(204);
-  };
+  }
 }
 
 export class BoardMemberHandler {
-  static addMember = async (
+  static async addMember(
     req: FastifyRequest<{ Body: AddMemberBody; Params: MemberParams }>,
     reply: FastifyReply,
-  ): Promise<GlobalResponse> => {
+  ): Promise<GlobalResponseMessage> {
     const b = req.body,
       p = req.params;
     const user = AuthPayloadSchema.parse(req.user);
 
-    const userRepo = new PostgresUserRepository(db);
-    const boardRepo = new PostgresBoardRepository(db, {});
-    const memberRepo = new PostgresBoardMemberRepository(db, {});
-    const memberPolicy = new PostgresBoardMemberPolicy(db);
-    const eventEmitter = new IoEventEmitter(io);
-
-    const userToBeJoined = await userRepo.getByEmail(b.email);
-    const addMember = new AddMember(
-      boardRepo,
-      memberRepo,
-      memberPolicy,
-      eventEmitter,
-    );
-    await addMember.execute(p.id, user.id, userToBeJoined.id);
+    const foundUser = await userRepo.getByEmail(b.email);
+    await kanban.addMember.execute({
+      boardId: p.id,
+      memberId: user.id,
+      userId: foundUser.id,
+    });
 
     reply.status(201);
     return { message: "Member added." };
-  };
+  }
 
-  static removeMember = async (
+  static async removeMember(
     req: FastifyRequest<{ Params: MemberParams }>,
     reply: FastifyReply,
-  ): Promise<void> => {
+  ): Promise<void> {
     const p = req.params;
     const user = AuthPayloadSchema.parse(req.user);
 
-    const boardRepo = new PostgresBoardRepository(db, {});
-    const memberRepo = new PostgresBoardMemberRepository(db, {});
-    const memberPolicy = new PostgresBoardMemberPolicy(db);
-    const eventEmitter = new IoEventEmitter(io);
-
-    const removeMember = new RemoveMember(
-      boardRepo,
-      memberRepo,
-      memberPolicy,
-      eventEmitter,
-    );
-    await removeMember.execute(p.id, user.id);
+    await kanban.removeMember.execute({ boardId: p.id, memberId: user.id });
 
     reply.status(204);
-  };
+  }
 }

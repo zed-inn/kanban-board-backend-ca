@@ -11,8 +11,8 @@ import {
   UpdateColumnParamsSchema,
   UpdateColumnPositionBodySchema,
 } from "./column.schema";
-import { GlobalResponseSchema } from "@shared/schema/global.schema";
-import { RestrictTo } from "@shared/middlewares/fastify-restrict-access.hook";
+import { GlobalResponseMessageSchema } from "@shared/schema/global-response.schema";
+import { RestrictTo } from "@shared/hooks/restrict-to.hook";
 
 export const ColumnRouter = async (router: ZodFastifyInstance) => {
   router.get(
@@ -34,7 +34,7 @@ export const ColumnRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: CreateColumnBodySchema,
         params: CreateColumnParamsSchema,
-        response: { 201: GlobalResponseSchema() },
+        response: { 201: GlobalResponseMessageSchema },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
@@ -47,7 +47,7 @@ export const ColumnRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: UpdateColumnNameBodySchema,
         params: UpdateColumnParamsSchema,
-        response: { 200: GlobalResponseSchema() },
+        response: { 200: GlobalResponseMessageSchema },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
@@ -60,7 +60,7 @@ export const ColumnRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: UpdateColumnPositionBodySchema,
         params: UpdateColumnParamsSchema,
-        response: { 200: GlobalResponseSchema() },
+        response: { 200: GlobalResponseMessageSchema },
       },
       preHandler: [RestrictTo.loggedInUser],
     },

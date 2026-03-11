@@ -1,4 +1,3 @@
-import { GlobalResponse } from "../../shared/schema/global.schema";
 import { FastifyReply, FastifyRequest } from "fastify";
 import {
   CreateCardBody,
@@ -11,180 +10,115 @@ import {
   UpdateCardLocationBody,
   UpdateCardParams,
 } from "./card.schema";
-import { AuthPayloadSchema } from "../../shared/schema/auth-payload.schema";
-import {
-  AddCard,
-  GetColumnCards,
-  RemoveCard,
-  ReorderCard,
-  UpdateCardBody,
-} from "kanban";
-import { PostgresCardRepository } from "@interfaces/repo/card.repository";
-import { db } from "@config/db";
-import { PostgresBoardMemberPolicy } from "@interfaces/policies/board-member.policy";
-import { PostgresColumnPolicy } from "@interfaces/policies/column.policy";
-import { UUIDGenerator } from "@interfaces/utils/id-generator.util";
-import { PostgresBoardMemberRepository } from "@interfaces/repo/board-member.repository";
-import { IoEventEmitter } from "@interfaces/emitter/event.emitter";
-import { io } from "@config/io-server";
+import { AuthPayloadSchema } from "@shared/schema/auth-payload.schema";
+import { kanban } from "@config/core";
+import { PER_PAGE } from "@constants/pagination";
+import { GlobalResponseMessage } from "@shared/schema/global-response.schema";
 
 export class CardHandler {
-  static getCardsInColumn = async (
+  static async getCardsInColumn(
     req: FastifyRequest<{ Params: GetCardsParams; Querystring: GetCardsQuery }>,
     reply: FastifyReply,
-  ): Promise<GetCardsResponse> => {
+  ): Promise<GetCardsResponse> {
     const q = req.query,
       p = req.params;
     const user = AuthPayloadSchema.parse(req.user);
 
-    const cardRepo = new PostgresCardRepository(db, { page: q.page });
-    const memberPolicy = new PostgresBoardMemberPolicy(db);
-    const columnPolicy = new PostgresColumnPolicy(db);
-
-    const getCardInColumn = new GetColumnCards(
-      cardRepo,
-      memberPolicy,
-      columnPolicy,
-    );
-    const cards = await getCardInColumn.execute(p.boardId, p.columnId, user.id);
+    const res = await kanban.getColumnCards.execute({
+      boardId: p.boardId,
+      columnId: p.columnId,
+      memberId: user.id,
+      pagination: { cursor: q.position, limit: PER_PAGE.cards },
+    });
 
     reply.status(200);
     return {
       message: "Cards fetched.",
-      data: { cards: cards.map((c) => c.attrbs) },
+      data: { cards: res.data, nextCursor: res.nextCursor as any },
     };
-  };
+  }
 
-  static addCard = async (
+  static async addCard(
     req: FastifyRequest<{ Body: CreateCardBody; Params: CreateCardParams }>,
     reply: FastifyReply,
-  ): Promise<GlobalResponse> => {
+  ): Promise<GlobalResponseMessage> {
     const b = req.body,
       p = req.params;
     const user = AuthPayloadSchema.parse(req.user);
 
-    const idGenerator = new UUIDGenerator();
-    const memberRepo = new PostgresBoardMemberRepository(db, {});
-    const cardRepo = new PostgresCardRepository(db, {});
-    const memberPolicy = new PostgresBoardMemberPolicy(db);
-    const columnPolicy = new PostgresColumnPolicy(db);
-    const eventEmitter = new IoEventEmitter(io);
-
-    const addCard = new AddCard(
-      idGenerator,
-      cardRepo,
-      memberRepo,
-      cardRepo,
-      memberPolicy,
-      columnPolicy,
-      eventEmitter,
-    );
-    await addCard.execute(b.title, b.content, p.columnId, p.boardId, user.id);
+    await kanban.addCard.execute({
+      boardId: p.boardId,
+      columnId: p.columnId,
+      content: b.content,
+      title: b.title,
+      memberId: user.id,
+    });
 
     reply.status(201);
     return { message: "Card added." };
-  };
+  }
 
-  static updateCardBody = async (
+  static async updateCardBody(
     req: FastifyRequest<{ Body: UpdateCardBodyBody; Params: UpdateCardParams }>,
     reply: FastifyReply,
-  ): Promise<GlobalResponse> => {
+  ): Promise<GlobalResponseMessage> {
     const b = req.body,
       p = req.params;
     const user = AuthPayloadSchema.parse(req.user);
 
-    const memberRepo = new PostgresBoardMemberRepository(db, {});
-    const cardRepo = new PostgresCardRepository(db, {});
-    const memberPolicy = new PostgresBoardMemberPolicy(db);
-    const columnPolicy = new PostgresColumnPolicy(db);
-    const eventEmitter = new IoEventEmitter(io);
-
-    const updateCardBody = new UpdateCardBody(
-      memberRepo,
-      cardRepo,
-      memberPolicy,
-      columnPolicy,
-      eventEmitter,
-    );
-    await updateCardBody.execute(
-      p.id,
-      {
-        ...(b.title ? { title: b.title } : {}),
-        ...(b.content || b.content === null ? { content: b.content } : {}),
-      },
-      p.columnId,
-      p.boardId,
-      user.id,
-    );
+    await kanban.updateCardBody.execute({
+      boardId: p.boardId,
+      cardId: p.id,
+      columnId: p.columnId,
+      memberId: user.id,
+      ...(b.title ? { title: b.title } : {}),
+      ...(b.content ? { content: b.content } : {}),
+    });
 
     reply.status(200);
     return { message: "Card body updated." };
-  };
+  }
 
-  static updateCardLocation = async (
+  static async updateCardLocation(
     req: FastifyRequest<{
       Body: UpdateCardLocationBody;
       Params: UpdateCardParams;
     }>,
     reply: FastifyReply,
-  ): Promise<GlobalResponse> => {
+  ): Promise<GlobalResponseMessage> {
     const b = req.body,
       p = req.params;
     const user = AuthPayloadSchema.parse(req.user);
 
-    const memberRepo = new PostgresBoardMemberRepository(db, {});
-    const cardRepo = new PostgresCardRepository(db, {});
-    const memberPolicy = new PostgresBoardMemberPolicy(db);
-    const columnPolicy = new PostgresColumnPolicy(db);
-    const eventEmitter = new IoEventEmitter(io);
-
-    const reorderCard = new ReorderCard(
-      cardRepo,
-      memberRepo,
-      cardRepo,
-      memberPolicy,
-      columnPolicy,
-      eventEmitter,
-    );
-    await reorderCard.execute(
-      p.id,
-      {
-        ...(b.id ? { iPOCardId: b.id } : {}),
-        ...(b.columnId ? { columnId: b.columnId } : {}),
-      },
-      p.columnId,
-      p.boardId,
-      user.id,
-    );
+    await kanban.reorderCard.execute({
+      boardId: p.boardId,
+      cardId: p.id,
+      columnId: p.columnId,
+      memberId: user.id,
+      ...(b.id ? { targetCardId: b.id } : {}),
+      ...(b.columnId ? { targetColumnId: b.columnId } : {}),
+    });
 
     reply.status(200);
     return { message: "Card reordered." };
-  };
+  }
 
-  static deleteCard = async (
+  static async deleteCard(
     req: FastifyRequest<{
       Params: DeleteCardParams;
     }>,
     reply: FastifyReply,
-  ): Promise<void> => {
+  ): Promise<void> {
     const p = req.params;
     const user = AuthPayloadSchema.parse(req.user);
 
-    const memberRepo = new PostgresBoardMemberRepository(db, {});
-    const cardRepo = new PostgresCardRepository(db, {});
-    const memberPolicy = new PostgresBoardMemberPolicy(db);
-    const columnPolicy = new PostgresColumnPolicy(db);
-    const eventEmitter = new IoEventEmitter(io);
-
-    const removeCard = new RemoveCard(
-      memberRepo,
-      cardRepo,
-      memberPolicy,
-      columnPolicy,
-      eventEmitter,
-    );
-    await removeCard.execute(p.id, p.columnId, p.boardId, user.id);
+    await kanban.removeCard.execute({
+      boardId: p.boardId,
+      cardId: p.id,
+      columnId: p.columnId,
+      memberId: user.id,
+    });
 
     reply.status(204);
-  };
+  }
 }

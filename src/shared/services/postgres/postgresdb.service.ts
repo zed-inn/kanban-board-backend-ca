@@ -1,5 +1,14 @@
-import { Pool, PoolClient, QueryResult } from "pg";
-import { DatabaseConnError } from "../errors/db.error";
+import { ApplicationError } from "kanban";
+import { Pool, PoolClient } from "pg";
+import { PostgresDatabaseQueryResult } from "./postgres-query.service";
+
+export class DatabaseConnError extends ApplicationError {
+  readonly error = "database_error";
+  readonly code = "DATABASE_CONNECTION_ERROR";
+  constructor(msg?: string) {
+    super(msg ?? "Database could not be connected");
+  }
+}
 
 export type PgConnection =
   | PostgresDatabasePoolConn
@@ -108,28 +117,4 @@ export class PostgresDatabaseClientConn {
     commit: async () => this.client.query("COMMIT;"),
     rollback: async () => this.client.query("ROLLBACK;"),
   };
-}
-
-export class PostgresDatabaseQueryResult {
-  protected readonly rowCount: number;
-
-  constructor(protected readonly res: QueryResult<any>) {
-    this.rowCount = this.res.rowCount ?? 0;
-  }
-
-  public get rows() {
-    return this.res.rows;
-  }
-
-  public get none() {
-    return this.rowCount === 0;
-  }
-
-  public get top() {
-    return this.rows[0];
-  }
-
-  public get bottom() {
-    return this.rows[this.rowCount - 1];
-  }
 }

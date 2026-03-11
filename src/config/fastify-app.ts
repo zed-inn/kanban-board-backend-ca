@@ -1,7 +1,7 @@
 import fastify from "fastify";
 import fastifyCookie from "@fastify/cookie";
 import { env } from "./env";
-import { authenticate } from "@shared/middlewares/fastify-authenticate.plugin";
+import { authenticate } from "@shared/middlewares/authenticate-fastify";
 import {
   serializerCompiler,
   validatorCompiler,

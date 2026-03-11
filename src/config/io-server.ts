@@ -1,7 +1,7 @@
-import app from "./fastify-app";
+import app from "@config/fastify-app";
 import { SocketData } from "@shared/types/socket";
-import { IoServer } from "@shared/services/io-server.service";
-import { authenticate } from "@shared/middlewares/socket-authenticate.middleware";
+import { IoServer } from "@socket-io/io-server.service";
+import { authenticate } from "@shared/middlewares/authenticate-socket";
 
 const ioServer = IoServer<SocketData>(app.server, {
   cors: { credentials: true },

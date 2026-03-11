@@ -1,5 +1,8 @@
 import { env } from "@config/env";
-import { AuthPayload, AuthPayloadSchema } from "../schema/auth-payload.schema";
+import {
+  AuthPayload,
+  AuthPayloadSchema,
+} from "@shared/schema/auth-payload.schema";
 import jwt from "jsonwebtoken";
 
 export class AuthTokenService {

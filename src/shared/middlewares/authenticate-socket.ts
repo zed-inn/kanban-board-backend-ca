@@ -1,8 +1,8 @@
 import fastifyCookie from "@fastify/cookie";
-import { UserNotLoggedInError } from "../errors/auth.error";
-import { AuthPayloadSchema } from "../schema/auth-payload.schema";
-import { AuthTokenService } from "../services/auth-token.service";
-import { IoSocket, SocketData, SocketNextHandler } from "../types/socket";
+import { UserNotLoggedInError } from "@shared/errors/auth.error";
+import { AuthPayloadSchema } from "@shared/schema/auth-payload.schema";
+import { AuthTokenService } from "@shared/services/auth/auth-token.service";
+import { IoSocket, SocketData, SocketNextHandler } from "@shared/types/socket";
 
 export const authenticate = (
   socket: IoSocket<SocketData>,

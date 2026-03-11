@@ -1,9 +1,6 @@
 import { z } from "zod";
-import {
-  GlobalQuerySchema,
-  GlobalResponseSchema,
-} from "../../shared/schema/global.schema";
-import { ColumnModel } from "@interfaces/repo/column.repository";
+import { PostgresColumnModel as ColumnModel } from "@postgres/repo/column.repository";
+import { GlobalResponseSchemaWithData } from "@shared/schema/global-response.schema";
 
 export const CreateColumnBodySchema = ColumnModel.pick({ name: true });
 export type CreateColumnBody = z.infer<typeof CreateColumnBodySchema>;
@@ -31,7 +28,9 @@ export const DeleteColumnParamsSchema = ColumnModel.pick({
 });
 export type DeleteColumnParams = z.infer<typeof DeleteColumnParamsSchema>;
 
-export const GetColumnQuerySchema = GlobalQuerySchema.pick({ page: true });
+export const GetColumnQuerySchema = ColumnModel.pick({
+  position: true,
+}).partial();
 export type GetColumnQuery = z.infer<typeof GetColumnQuerySchema>;
 
 export const GetColumnParamsSchema = ColumnModel.pick({
@@ -39,7 +38,8 @@ export const GetColumnParamsSchema = ColumnModel.pick({
 });
 export type GetColumnParams = z.infer<typeof GetColumnParamsSchema>;
 
-export const GetColumnResponseSchema = GlobalResponseSchema({
-  columns: z.array(ColumnModel.omit({ createdAt: true, updatedAt: true })),
+export const GetColumnResponseSchema = GlobalResponseSchemaWithData({
+  columns: z.array(ColumnModel),
+  nextCursor: ColumnModel.shape.position,
 });
 export type GetColumnResponse = z.infer<typeof GetColumnResponseSchema>;

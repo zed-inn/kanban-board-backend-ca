@@ -8,9 +8,19 @@
     "types": [],
 
     "paths": {
-      "@config/*": ["./src/config/*"],
       "@shared/*": ["./src/shared/*"],
-      "@interfaces/*": ["./src/interfaces/*"]
+      "@config/*": ["./src/config/*"],
+      "@postgres/*": [
+        "./src/interfaces/postgres/*",
+        "./src/shared/services/postgres/*"
+      ],
+      "@socket-io/*": [
+        "./src/interfaces/socket-io/*",
+        "./src/shared/services/socket-io/*"
+      ],
+      "@uuid/*": ["./src/interfaces/uuid/*"],
+      "@routes/*": ["./src/routes/*"],
+      "@constants/*": ["./src/constants/*"]
     },
 
     "sourceMap": true,

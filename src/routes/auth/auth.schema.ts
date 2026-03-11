@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UserModel } from "@interfaces/repo/user.repository";
+import { PostgresUserModel as UserModel } from "@postgres/repo/user.repository";
 
 export const PasswordModel = z.string().min(8);
 

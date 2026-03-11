@@ -1,10 +1,8 @@
 import { z } from "zod";
-import {
-  GlobalQuerySchema,
-  GlobalResponseSchema,
-} from "../../shared/schema/global.schema";
-import { BoardModel } from "@interfaces/repo/board.repository";
-import { UserModel } from "@interfaces/repo/user.repository";
+import { PostgresBoardModel as BoardModel } from "@postgres/repo/board.repository";
+import { PostgresUserModel as UserModel } from "@postgres/repo/user.repository";
+import { GlobalResponseSchemaWithData } from "@shared/schema/global-response.schema";
+import { BoardReadModel } from "kanban";
 
 export const CreateBoardBodySchema = BoardModel.pick({ name: true });
 export type CreateBoardBody = z.infer<typeof CreateBoardBodySchema>;
@@ -27,12 +25,13 @@ export type AddMemberBody = z.infer<typeof AddMemberBodySchema>;
 export const MemberParamsSchema = BoardModel.pick({ id: true });
 export type MemberParams = z.infer<typeof MemberParamsSchema>;
 
-export const GetBoardsQuerySchema = GlobalQuerySchema.pick({
-  page: true,
-});
+export const GetBoardsQuerySchema = BoardModel.pick({
+  updatedAt: true,
+}).partial();
 export type GetBoardsQuery = z.infer<typeof GetBoardsQuerySchema>;
 
-export const GetBoardsResponseSchema = GlobalResponseSchema({
-  boards: z.array(BoardModel.omit({ updatedAt: true, createdAt: true })),
+export const GetBoardsResponseSchema = GlobalResponseSchemaWithData({
+  boards: z.array(BoardModel),
+  nextCursor: BoardModel.shape.updatedAt,
 });
 export type GetBoardsResponse = z.infer<typeof GetBoardsResponseSchema>;

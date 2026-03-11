@@ -11,8 +11,8 @@ import {
   UpdateBoardOwnerBodySchema,
   UpdateBoardParamsSchema,
 } from "./board.schema";
-import { GlobalResponseSchema } from "@shared/schema/global.schema";
-import { RestrictTo } from "@shared/middlewares/fastify-restrict-access.hook";
+import { RestrictTo } from "@shared/hooks/restrict-to.hook";
+import { GlobalResponseMessageSchema } from "@shared/schema/global-response.schema";
 
 export const BoardRouter = async (router: ZodFastifyInstance) => {
   router.get(
@@ -24,7 +24,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
       },
       preHandler: [RestrictTo.loggedInUser],
     },
-    BoardHandler.getBoardsMemberOf,
+    BoardHandler.getMemberBoards,
   );
 
   router.get(
@@ -44,7 +44,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
     {
       schema: {
         body: CreateBoardBodySchema,
-        response: { 201: GlobalResponseSchema() },
+        response: { 201: GlobalResponseMessageSchema },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
@@ -57,7 +57,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: UpdateBoardNameBodySchema,
         params: UpdateBoardParamsSchema,
-        response: { 200: GlobalResponseSchema() },
+        response: { 200: GlobalResponseMessageSchema },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
@@ -70,7 +70,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: UpdateBoardOwnerBodySchema,
         params: UpdateBoardParamsSchema,
-        response: { 200: GlobalResponseSchema() },
+        response: { 200: GlobalResponseMessageSchema },
       },
       preHandler: [RestrictTo.loggedInUser],
     },
@@ -95,7 +95,7 @@ export const BoardRouter = async (router: ZodFastifyInstance) => {
       schema: {
         body: AddMemberBodySchema,
         params: MemberParamsSchema,
-        response: { 201: GlobalResponseSchema() },
+        response: { 201: GlobalResponseMessageSchema },
       },
       preHandler: [RestrictTo.loggedInUser],
     },

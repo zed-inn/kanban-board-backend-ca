@@ -1,10 +1,7 @@
 import { z } from "zod";
-import {
-  GlobalQuerySchema,
-  GlobalResponseSchema,
-} from "../../shared/schema/global.schema";
-import { CardModel } from "@interfaces/repo/card.repository";
-import { ColumnModel } from "@interfaces/repo/column.repository";
+import { PostgresCardModel as CardModel } from "@postgres/repo/card.repository";
+import { PostgresColumnModel as ColumnModel } from "@postgres/repo/column.repository";
+import { GlobalResponseSchemaWithData } from "@shared/schema/global-response.schema";
 
 export const CreateCardBodySchema = CardModel.pick({
   title: true,
@@ -43,7 +40,7 @@ export const DeleteCardParamsSchema = CardModel.pick({
 }).extend(ColumnModel.pick({ boardId: true }).shape);
 export type DeleteCardParams = z.infer<typeof DeleteCardParamsSchema>;
 
-export const GetCardsQuerySchema = GlobalQuerySchema.pick({ page: true });
+export const GetCardsQuerySchema = CardModel.pick({ position: true }).partial();
 export type GetCardsQuery = z.infer<typeof GetCardsQuerySchema>;
 
 export const GetCardsParamsSchema = CardModel.pick({ columnId: true }).extend(
@@ -51,7 +48,8 @@ export const GetCardsParamsSchema = CardModel.pick({ columnId: true }).extend(
 );
 export type GetCardsParams = z.infer<typeof GetCardsParamsSchema>;
 
-export const GetCardsResponseSchema = GlobalResponseSchema({
-  cards: z.array(CardModel.omit({ createdAt: true, updatedAt: true })),
+export const GetCardsResponseSchema = GlobalResponseSchemaWithData({
+  cards: z.array(CardModel),
+  nextCursor: CardModel.shape.position,
 });
 export type GetCardsResponse = z.infer<typeof GetCardsResponseSchema>;
