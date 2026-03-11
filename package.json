@@ -1,12 +1,12 @@
 {
   "name": "kanban-board-backend-ca",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Kanban Board Backend Application",
   "private": "true",
   "main": "src/app.js",
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "npm run clean && npx tsc -p tsconfig.json",
+    "build": "npm run clean && npx tsc -p tsconfig.json && npx tsc-alias",
     "dev": "nodemon"
   },
   "repository": {
