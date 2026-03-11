@@ -6,7 +6,7 @@ export const shutdown = async (signal: string) => {
   try {
     app.log.info(`${signal} received. Starting graceful shutdown...`);
 
-    await io.close((err) => {
+    io.close((err) => {
       if (err) app.log.error(err);
       else app.log.info("Socket closed.");
     });
